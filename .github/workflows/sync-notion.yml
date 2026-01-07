@@ -1,0 +1,35 @@
+name: Sync Notion to Supabase
+
+on:
+  schedule:
+    # 毎日午前6時(JST)に実行 = UTC 21:00
+    - cron: '0 21 * * *'
+  workflow_dispatch:
+    # 手動実行も可能
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests python-dotenv
+
+      - name: Sync Notion to Supabase
+        run: python scripts/sync_notion_to_supabase.py
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+      - name: Report result
+        if: always()
+        run: echo "Sync completed at $(date)"
