@@ -137,28 +137,25 @@ def convert_page_to_record(page: dict) -> dict:
 
 
 def upsert_to_supabase(records: list) -> dict:
-    """Upsert records to Supabase"""
-    url = f"{SUPABASE_URL}/rest/v1/notion_orders"
-    success_count = 0
-    errors = []
+    """Upsert records to Supabase (notion_idで重複時は更新)"""
+    # on_conflict=notion_id でupsertを有効化
+    url = f"{SUPABASE_URL}/rest/v1/notion_orders?on_conflict=notion_id"
 
-    for record in records:
-        response = requests.post(url, headers=get_supabase_headers(), json=record)
+    headers = {
+        "apikey": SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "Content-Type": "application/json",
+        "Prefer": "resolution=merge-duplicates,return=minimal"
+    }
 
-        if response.status_code in [200, 201]:
-            success_count += 1
-        else:
-            errors.append({
-                "notion_id": record.get("notion_id"),
-                "error": response.text[:100]
-            })
+    # バッチでupsert（1件ずつではなく一括で）
+    response = requests.post(url, headers=headers, json=records)
 
-    if errors and len(errors) <= 5:
-        print(f"   ⚠️ {len(errors)} errors:")
-        for e in errors[:3]:
-            print(f"      {e['notion_id']}: {e['error']}")
-
-    return {"success": True, "count": success_count, "errors": len(errors)}
+    if response.status_code in [200, 201]:
+        return {"success": True, "count": len(records), "errors": 0}
+    else:
+        print(f"   ⚠️ Batch upsert error: {response.text[:200]}")
+        return {"success": False, "count": 0, "errors": len(records)}
 
 
 def sync_all():
