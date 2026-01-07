@@ -1,6 +1,7 @@
 # Core
 reflex>=0.8.24
 reflex-ag-grid>=0.0.11
+httpx>=0.27.0
 
 # Database
 sqlalchemy>=2.0.0

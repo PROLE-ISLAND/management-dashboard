@@ -1,0 +1,1957 @@
+{
+  "database_id": "44768ed1b8494c059f3080bd51f6968b",
+  "title": "発注/依頼タスクDB",
+  "exported_at": "2026-01-07T13:34:37.113327",
+  "properties": {
+    "時給/数量単価": {
+      "type": "number",
+      "id": "%3A%5EfB"
+    },
+    "ToDoDB": {
+      "type": "relation",
+      "id": "%3B_bg",
+      "related_database_id": "044020c2-26ed-4a2d-8f6f-99bafd23837e",
+      "type_config": "dual_property"
+    },
+    "スキル評価": {
+      "type": "select",
+      "id": "GjUv",
+      "options": [
+        {
+          "name": "Lv.5：大幅に超え、オペレーション改善に寄与する",
+          "color": "red"
+        },
+        {
+          "name": "Lv.4：期待以上に目標達成する",
+          "color": "pink"
+        },
+        {
+          "name": "Lv.3：会社の設定した目標を達成できる",
+          "color": "green"
+        },
+        {
+          "name": "Lv.2：未達であるが、改善の兆しがある",
+          "color": "yellow"
+        },
+        {
+          "name": "Lv.1：大幅に未達であり、改善の見込みもない",
+          "color": "gray"
+        }
+      ]
+    },
+    "職務範囲": {
+      "type": "select",
+      "id": "HDV%3E",
+      "options": [
+        {
+          "name": "ビジネス",
+          "color": "red"
+        },
+        {
+          "name": "マーケティング",
+          "color": "blue"
+        },
+        {
+          "name": "デザイン",
+          "color": "pink"
+        },
+        {
+          "name": "採用",
+          "color": "green"
+        },
+        {
+          "name": "コンテンツ",
+          "color": "brown"
+        }
+      ]
+    },
+    "決裁者": {
+      "type": "people",
+      "id": "HkH%3B"
+    },
+    "納期/シフト": {
+      "type": "date",
+      "id": "K%3A%7CJ"
+    },
+    "時間/数量": {
+      "type": "number",
+      "id": "K%40qI"
+    },
+    "スタンス評価": {
+      "type": "select",
+      "id": "KN%3AQ",
+      "options": [
+        {
+          "name": "Lv.5：さらに主体的な質疑応答や前向きな提案",
+          "color": "red"
+        },
+        {
+          "name": "Lv.4：笑顔で挨拶ができ、業務指示に従う",
+          "color": "green"
+        },
+        {
+          "name": "Lv.3：業務指示に従う",
+          "color": "yellow"
+        },
+        {
+          "name": "Lv.2：改善指示を行うと渋々従う",
+          "color": "default"
+        },
+        {
+          "name": "Lv.1：指示に従わない",
+          "color": "gray"
+        }
+      ]
+    },
+    "発注科目/依頼業務": {
+      "type": "multi_select",
+      "id": "MF%3CE",
+      "options": [
+        {
+          "name": "基礎設定",
+          "color": "pink"
+        },
+        {
+          "name": "リリース設定",
+          "color": "yellow"
+        },
+        {
+          "name": "サイトストラクチャ",
+          "color": "purple"
+        },
+        {
+          "name": "商品入稿",
+          "color": "blue"
+        },
+        {
+          "name": "RS",
+          "color": "blue"
+        },
+        {
+          "name": "カテゴリー作成",
+          "color": "green"
+        },
+        {
+          "name": "デザコン",
+          "color": "yellow"
+        },
+        {
+          "name": "チャット対応",
+          "color": "orange"
+        },
+        {
+          "name": "メルアポ",
+          "color": "gray"
+        },
+        {
+          "name": "リスト作成",
+          "color": "default"
+        },
+        {
+          "name": "shopify有料テーマ選定",
+          "color": "green"
+        },
+        {
+          "name": "weshopサイトデザイン",
+          "color": "green"
+        },
+        {
+          "name": "LP制作",
+          "color": "red"
+        },
+        {
+          "name": "ページデザイン",
+          "color": "yellow"
+        },
+        {
+          "name": "SEOライティング",
+          "color": "blue"
+        },
+        {
+          "name": "SEO実装",
+          "color": "orange"
+        },
+        {
+          "name": "metaバナー",
+          "color": "purple"
+        },
+        {
+          "name": "TDAバナー",
+          "color": "red"
+        },
+        {
+          "name": "商品ページ改善",
+          "color": "brown"
+        },
+        {
+          "name": "【選考】動画要件企画",
+          "color": "blue"
+        },
+        {
+          "name": "デザイン",
+          "color": "pink"
+        },
+        {
+          "name": "メール対応",
+          "color": "green"
+        },
+        {
+          "name": "営業事務",
+          "color": "red"
+        },
+        {
+          "name": "WBS外",
+          "color": "purple"
+        },
+        {
+          "name": "動画要件",
+          "color": "yellow"
+        },
+        {
+          "name": "グロース_コンテンツ",
+          "color": "gray"
+        },
+        {
+          "name": "グロース_広告",
+          "color": "yellow"
+        },
+        {
+          "name": "グロース_デザイン",
+          "color": "pink"
+        }
+      ]
+    },
+    "MBDB": {
+      "type": "relation",
+      "id": "MHVg",
+      "related_database_id": "17d40a7c-b53e-808c-8475-e146b4326504",
+      "type_config": "dual_property"
+    },
+    "担当者": {
+      "type": "people",
+      "id": "M%7BeY"
+    },
+    "発注先担当者URL": {
+      "type": "url",
+      "id": "NZS_"
+    },
+    "申請日": {
+      "type": "date",
+      "id": "Oo%5EN"
+    },
+    "発注/依頼媒体": {
+      "type": "select",
+      "id": "PubA",
+      "options": [
+        {
+          "name": "タイミー",
+          "color": "yellow"
+        },
+        {
+          "name": "マッチボックス",
+          "color": "green"
+        },
+        {
+          "name": "クラウドワークス",
+          "color": "blue"
+        },
+        {
+          "name": "ランサーズ",
+          "color": "red"
+        },
+        {
+          "name": "ココナラ",
+          "color": "pink"
+        }
+      ]
+    },
+    "発注採択理由": {
+      "type": "rich_text",
+      "id": "U%3Fn%3D"
+    },
+    "要件定義URL": {
+      "type": "rollup",
+      "id": "W%3EZF",
+      "function": "show_original",
+      "relation_property_id": ";_bg",
+      "rollup_property_id": "X=T~"
+    },
+    "起案者": {
+      "type": "people",
+      "id": "%5C%5CVN"
+    },
+    "業務レベル": {
+      "type": "select",
+      "id": "%5DaLk",
+      "options": [
+        {
+          "name": "Direction",
+          "color": "brown"
+        },
+        {
+          "name": "Hard/企画推進",
+          "color": "red"
+        },
+        {
+          "name": "Normal/実務推進",
+          "color": "yellow"
+        },
+        {
+          "name": "Easy/定型",
+          "color": "green"
+        }
+      ]
+    },
+    "CL": {
+      "type": "rollup",
+      "id": "gmoO",
+      "function": "show_original",
+      "relation_property_id": ";_bg",
+      "rollup_property_id": "tAUc"
+    },
+    "総支給額": {
+      "type": "formula",
+      "id": "j%3F%5CD",
+      "expression": "{{notion:block_property:%3A%5EfB:00000000-0000-0000-0000-000000000000:954269f5-dfaa-4732-8548-696a6db32164}}*{{notion:block_property:K%40qI:00000000-0000-0000-0000-000000000000:954269f5-dfaa-4732-8548-696a6db32164}}"
+    },
+    "NPS": {
+      "type": "select",
+      "id": "m%40_w",
+      "options": [
+        {
+          "name": "非常に高い(9~10)",
+          "color": "red"
+        },
+        {
+          "name": "高い(7~8)",
+          "color": "pink"
+        },
+        {
+          "name": "普通(4~6)",
+          "color": "yellow"
+        },
+        {
+          "name": "低い(0~3)",
+          "color": "blue"
+        }
+      ]
+    },
+    "勤務時間(クール)": {
+      "type": "select",
+      "id": "nxkB",
+      "options": [
+        {
+          "name": "第一クール",
+          "color": "pink"
+        },
+        {
+          "name": "第二クール",
+          "color": "yellow"
+        },
+        {
+          "name": "第三クール",
+          "color": "blue"
+        },
+        {
+          "name": "フルタイム",
+          "color": "green"
+        },
+        {
+          "name": "フレキシブル",
+          "color": "purple"
+        },
+        {
+          "name": "新規",
+          "color": "red"
+        },
+        {
+          "name": "既存",
+          "color": "green"
+        },
+        {
+          "name": "選考",
+          "color": "purple"
+        }
+      ]
+    },
+    "減点・懸念事項": {
+      "type": "rich_text",
+      "id": "q%3ABB"
+    },
+    "発注ステータス": {
+      "type": "status",
+      "id": "q%3BMB",
+      "options": [
+        {
+          "name": "要件作成中",
+          "color": "gray"
+        },
+        {
+          "name": "要件レビュー差戻し中",
+          "color": "gray"
+        },
+        {
+          "name": "要件レビュー中",
+          "color": "default"
+        },
+        {
+          "name": "対応ready",
+          "color": "pink"
+        },
+        {
+          "name": "要件承認済",
+          "color": "pink"
+        },
+        {
+          "name": "求人中",
+          "color": "yellow"
+        },
+        {
+          "name": "発注済",
+          "color": "green"
+        },
+        {
+          "name": "社内確認中",
+          "color": "orange"
+        },
+        {
+          "name": "社内レビュー済",
+          "color": "brown"
+        },
+        {
+          "name": "先方レビュー済",
+          "color": "blue"
+        },
+        {
+          "name": "納品済",
+          "color": "green"
+        },
+        {
+          "name": "反映済",
+          "color": "orange"
+        }
+      ],
+      "groups": [
+        {
+          "name": "To-do",
+          "option_ids": [
+            "EUwM",
+            "R`;g",
+            "bbbadb96-99fa-4e0d-b795-e7a792ef657c"
+          ]
+        },
+        {
+          "name": "In progress",
+          "option_ids": [
+            "Vvnd",
+            "CSit",
+            "aKA;",
+            "DPra",
+            "dKY~",
+            "Aop;",
+            "euS;"
+          ]
+        },
+        {
+          "name": "Complete",
+          "option_ids": [
+            "kllM",
+            "uZ~X"
+          ]
+        }
+      ]
+    },
+    "MB担当者名": {
+      "type": "select",
+      "id": "ucAS",
+      "options": [
+        {
+          "name": "新川 紘平",
+          "color": "brown"
+        },
+        {
+          "name": "大久保有紗",
+          "color": "brown"
+        },
+        {
+          "name": "山下 星菜",
+          "color": "brown"
+        },
+        {
+          "name": "山木香奈",
+          "color": "brown"
+        },
+        {
+          "name": "松村みゆき",
+          "color": "brown"
+        },
+        {
+          "name": "杉山香林",
+          "color": "brown"
+        },
+        {
+          "name": "金子 芳",
+          "color": "brown"
+        },
+        {
+          "name": "尾関史栞",
+          "color": "brown"
+        },
+        {
+          "name": "磯部梨華子",
+          "color": "brown"
+        },
+        {
+          "name": "中村杏",
+          "color": "brown"
+        },
+        {
+          "name": "田島恵里奈",
+          "color": "brown"
+        },
+        {
+          "name": "中村海人",
+          "color": "brown"
+        },
+        {
+          "name": "阪出健太",
+          "color": "brown"
+        },
+        {
+          "name": "中島希々花",
+          "color": "brown"
+        },
+        {
+          "name": "鈴木楓",
+          "color": "brown"
+        },
+        {
+          "name": "横田結香",
+          "color": "brown"
+        },
+        {
+          "name": "中町友望",
+          "color": "brown"
+        },
+        {
+          "name": "高橋花枝",
+          "color": "brown"
+        },
+        {
+          "name": "工藤祐希",
+          "color": "brown"
+        },
+        {
+          "name": "前田月",
+          "color": "brown"
+        },
+        {
+          "name": "粕谷美知",
+          "color": "brown"
+        },
+        {
+          "name": "海老原妙",
+          "color": "brown"
+        },
+        {
+          "name": "小川蘭",
+          "color": "brown"
+        },
+        {
+          "name": "藤崎博",
+          "color": "brown"
+        },
+        {
+          "name": "藤田匠",
+          "color": "brown"
+        },
+        {
+          "name": "瀧場大暉",
+          "color": "brown"
+        },
+        {
+          "name": "末廣梓織",
+          "color": "green"
+        },
+        {
+          "name": "吉村健太",
+          "color": "pink"
+        },
+        {
+          "name": "三河航青",
+          "color": "gray"
+        },
+        {
+          "name": "諏訪大佑",
+          "color": "brown"
+        },
+        {
+          "name": "原田愛結",
+          "color": "brown"
+        },
+        {
+          "name": "瀬下菜々美",
+          "color": "brown"
+        },
+        {
+          "name": "鈴木花那",
+          "color": "brown"
+        },
+        {
+          "name": "周東宇大",
+          "color": "orange"
+        },
+        {
+          "name": "瀧晶子",
+          "color": "brown"
+        },
+        {
+          "name": "藤原なつき",
+          "color": "brown"
+        },
+        {
+          "name": "田中里菜",
+          "color": "default"
+        },
+        {
+          "name": "瀧麻麻歴",
+          "color": "brown"
+        },
+        {
+          "name": "辻佑真",
+          "color": "blue"
+        },
+        {
+          "name": "梅木結一花",
+          "color": "yellow"
+        },
+        {
+          "name": "宮野雄太",
+          "color": "brown"
+        },
+        {
+          "name": "勝亦凜",
+          "color": "brown"
+        },
+        {
+          "name": "森亮太",
+          "color": "brown"
+        },
+        {
+          "name": "今石 龍都",
+          "color": "red"
+        },
+        {
+          "name": "小川真理",
+          "color": "brown"
+        },
+        {
+          "name": "穴吹颯斗",
+          "color": "red"
+        },
+        {
+          "name": "高橋ひとみ",
+          "color": "brown"
+        },
+        {
+          "name": "馬場玲",
+          "color": "brown"
+        },
+        {
+          "name": "岩竹 星璃",
+          "color": "brown"
+        },
+        {
+          "name": "平山 紗羅",
+          "color": "green"
+        },
+        {
+          "name": "井上留里伽",
+          "color": "brown"
+        },
+        {
+          "name": "黒田純平",
+          "color": "brown"
+        },
+        {
+          "name": "髙屋敷匠",
+          "color": "brown"
+        },
+        {
+          "name": "國光陽子",
+          "color": "brown"
+        },
+        {
+          "name": "宮下彩乃",
+          "color": "brown"
+        },
+        {
+          "name": "柴崎 愁",
+          "color": "pink"
+        },
+        {
+          "name": "玉蟲奈佳子",
+          "color": "brown"
+        },
+        {
+          "name": "高木明日香",
+          "color": "brown"
+        },
+        {
+          "name": "玉乃井春",
+          "color": "brown"
+        },
+        {
+          "name": "加藤木千尋",
+          "color": "orange"
+        },
+        {
+          "name": "萩原優衣",
+          "color": "orange"
+        },
+        {
+          "name": "北垣乃美",
+          "color": "purple"
+        },
+        {
+          "name": "三好瑠璃",
+          "color": "green"
+        },
+        {
+          "name": "森マユリ",
+          "color": "pink"
+        },
+        {
+          "name": "森優優里",
+          "color": "blue"
+        },
+        {
+          "name": "横山梨沙",
+          "color": "yellow"
+        },
+        {
+          "name": "塚田千紘",
+          "color": "green"
+        },
+        {
+          "name": "根津信作",
+          "color": "green"
+        },
+        {
+          "name": "吉松清香",
+          "color": "red"
+        },
+        {
+          "name": "大貫裕志",
+          "color": "yellow"
+        },
+        {
+          "name": "福田知之",
+          "color": "blue"
+        },
+        {
+          "name": "川口陽菜乃",
+          "color": "pink"
+        },
+        {
+          "name": "千葉愛",
+          "color": "brown"
+        },
+        {
+          "name": "蛯沢泰裕",
+          "color": "pink"
+        },
+        {
+          "name": "高屋敷",
+          "color": "red"
+        },
+        {
+          "name": "高屋敷匠",
+          "color": "gray"
+        },
+        {
+          "name": "谷一平",
+          "color": "orange"
+        },
+        {
+          "name": "村木萌香",
+          "color": "brown"
+        },
+        {
+          "name": "磯野法子",
+          "color": "gray"
+        },
+        {
+          "name": "河原未来",
+          "color": "gray"
+        },
+        {
+          "name": "仙田凛",
+          "color": "orange"
+        },
+        {
+          "name": "繁沢昴生",
+          "color": "blue"
+        },
+        {
+          "name": "尺奈和子",
+          "color": "red"
+        },
+        {
+          "name": "長屋朱音",
+          "color": "pink"
+        },
+        {
+          "name": "三浦剛",
+          "color": "red"
+        },
+        {
+          "name": "山中美南",
+          "color": "default"
+        },
+        {
+          "name": "小崎奏",
+          "color": "gray"
+        },
+        {
+          "name": "高橋彩乃",
+          "color": "brown"
+        },
+        {
+          "name": "園田瑠香",
+          "color": "red"
+        },
+        {
+          "name": "増崎綾乃",
+          "color": "red"
+        },
+        {
+          "name": "宮崎諭晴",
+          "color": "green"
+        },
+        {
+          "name": "渥美璃子",
+          "color": "red"
+        },
+        {
+          "name": "松浦庸介",
+          "color": "green"
+        },
+        {
+          "name": "仙田穂乃果",
+          "color": "yellow"
+        },
+        {
+          "name": "篠宮彩音",
+          "color": "red"
+        },
+        {
+          "name": "川本和可子",
+          "color": "default"
+        },
+        {
+          "name": "石田光司",
+          "color": "yellow"
+        },
+        {
+          "name": "川村文",
+          "color": "default"
+        },
+        {
+          "name": "甲斐更紗",
+          "color": "green"
+        },
+        {
+          "name": "粕谷夏美",
+          "color": "red"
+        },
+        {
+          "name": "坂出健太",
+          "color": "orange"
+        },
+        {
+          "name": "玉野井春",
+          "color": "orange"
+        },
+        {
+          "name": "小野隼",
+          "color": "gray"
+        },
+        {
+          "name": "山野遼平",
+          "color": "orange"
+        },
+        {
+          "name": "早野絵梨佳",
+          "color": "default"
+        },
+        {
+          "name": "加藤杏樹",
+          "color": "brown"
+        },
+        {
+          "name": "秋元量",
+          "color": "purple"
+        },
+        {
+          "name": "鳥越あゆみ",
+          "color": "pink"
+        },
+        {
+          "name": "蛯名会快",
+          "color": "orange"
+        },
+        {
+          "name": "吉次大地",
+          "color": "red"
+        },
+        {
+          "name": "森上かれん",
+          "color": "orange"
+        },
+        {
+          "name": "片山綾菜",
+          "color": "red"
+        },
+        {
+          "name": "森下凌也",
+          "color": "orange"
+        },
+        {
+          "name": "藤ヶ森初菜",
+          "color": "brown"
+        },
+        {
+          "name": "片山蘭奈",
+          "color": "gray"
+        },
+        {
+          "name": "山崎瑞恵",
+          "color": "gray"
+        },
+        {
+          "name": "澤田宗太郎",
+          "color": "brown"
+        },
+        {
+          "name": "中尾健亮",
+          "color": "yellow"
+        },
+        {
+          "name": "森優真理",
+          "color": "orange"
+        },
+        {
+          "name": "KIM JOONWOOK",
+          "color": "blue"
+        },
+        {
+          "name": "柳川 信輔",
+          "color": "blue"
+        },
+        {
+          "name": "越智 日和",
+          "color": "orange"
+        },
+        {
+          "name": "瀧　麻歴",
+          "color": "orange"
+        },
+        {
+          "name": "河原未來",
+          "color": "yellow"
+        },
+        {
+          "name": "内山 愛梨",
+          "color": "gray"
+        },
+        {
+          "name": "山野 美咲",
+          "color": "default"
+        },
+        {
+          "name": "菊池 ひなの",
+          "color": "blue"
+        },
+        {
+          "name": "伊藤 貫太",
+          "color": "blue"
+        },
+        {
+          "name": "北垣 乃美",
+          "color": "brown"
+        },
+        {
+          "name": "和泉 明日香",
+          "color": "orange"
+        },
+        {
+          "name": "深沢 聖華",
+          "color": "blue"
+        },
+        {
+          "name": "唐鎌 かほり",
+          "color": "pink"
+        },
+        {
+          "name": "榊 弘一",
+          "color": "gray"
+        },
+        {
+          "name": "重村大成",
+          "color": "brown"
+        },
+        {
+          "name": "熊谷 明香音",
+          "color": "pink"
+        },
+        {
+          "name": "東瀬 由佳",
+          "color": "blue"
+        },
+        {
+          "name": "西 音紅",
+          "color": "purple"
+        },
+        {
+          "name": "団 ちひろ",
+          "color": "orange"
+        },
+        {
+          "name": "山本 麻衣",
+          "color": "blue"
+        },
+        {
+          "name": "金子 美奈子",
+          "color": "orange"
+        },
+        {
+          "name": "藪崎 恵理佳",
+          "color": "green"
+        },
+        {
+          "name": "清野 杏香",
+          "color": "blue"
+        },
+        {
+          "name": "https://www.notion.so/prolestate/Web-2bf40a7cb53e800cb727d63ad0c24bba?v=18240a7cb53e80e5a42a000cd8672bd4&source=copy_link",
+          "color": "yellow"
+        },
+        {
+          "name": "安藤 理",
+          "color": "purple"
+        },
+        {
+          "name": "村井 飛翔",
+          "color": "pink"
+        },
+        {
+          "name": "木戸 晶",
+          "color": "default"
+        },
+        {
+          "name": "金子 あゆ美",
+          "color": "purple"
+        },
+        {
+          "name": "遠藤梨奈",
+          "color": "brown"
+        },
+        {
+          "name": "玉野井 春",
+          "color": "red"
+        },
+        {
+          "name": "鶴尾直幸",
+          "color": "gray"
+        },
+        {
+          "name": "片山 綾奈",
+          "color": "yellow"
+        },
+        {
+          "name": "石田 光司",
+          "color": "purple"
+        },
+        {
+          "name": "渡辺 梓",
+          "color": "purple"
+        },
+        {
+          "name": "濱崎 弘樹",
+          "color": "purple"
+        },
+        {
+          "name": "北井 俊之",
+          "color": "green"
+        },
+        {
+          "name": "棚田 雛子",
+          "color": "gray"
+        },
+        {
+          "name": "伊東 良彬",
+          "color": "gray"
+        },
+        {
+          "name": "瀬戸 ちゃこ",
+          "color": "green"
+        },
+        {
+          "name": "石田 力丸",
+          "color": "red"
+        },
+        {
+          "name": "平井 瑠果",
+          "color": "green"
+        },
+        {
+          "name": "海上 千尋",
+          "color": "pink"
+        },
+        {
+          "name": "鶴尾 直幸",
+          "color": "yellow"
+        },
+        {
+          "name": "和田 汐美",
+          "color": "pink"
+        },
+        {
+          "name": "前田 胡桃",
+          "color": "default"
+        },
+        {
+          "name": "石黒 智絵",
+          "color": "red"
+        },
+        {
+          "name": "宮野 夏実",
+          "color": "orange"
+        },
+        {
+          "name": "村上 竜漢",
+          "color": "default"
+        },
+        {
+          "name": "武田 夏海",
+          "color": "red"
+        },
+        {
+          "name": "後藤 貴寛",
+          "color": "purple"
+        },
+        {
+          "name": "材木 萌香",
+          "color": "yellow"
+        },
+        {
+          "name": "青山 なづな",
+          "color": "red"
+        },
+        {
+          "name": "衣川 由香",
+          "color": "green"
+        },
+        {
+          "name": "西谷 玲奈",
+          "color": "brown"
+        },
+        {
+          "name": "神山 海渚",
+          "color": "gray"
+        },
+        {
+          "name": "糸井 朋美",
+          "color": "purple"
+        },
+        {
+          "name": "桝田 桃菜",
+          "color": "brown"
+        },
+        {
+          "name": "岡田 拓真",
+          "color": "red"
+        },
+        {
+          "name": "渡邉 歩々来",
+          "color": "pink"
+        },
+        {
+          "name": "大場 亮昂",
+          "color": "yellow"
+        },
+        {
+          "name": "山本 茜",
+          "color": "green"
+        },
+        {
+          "name": "藤田 彦人",
+          "color": "brown"
+        },
+        {
+          "name": "中mら",
+          "color": "purple"
+        },
+        {
+          "name": "大池康人",
+          "color": "pink"
+        },
+        {
+          "name": "中村 智則",
+          "color": "green"
+        },
+        {
+          "name": "宮嶋翔子",
+          "color": "gray"
+        },
+        {
+          "name": "尾澤尚子",
+          "color": "yellow"
+        },
+        {
+          "name": "玉蟲",
+          "color": "default"
+        },
+        {
+          "name": "丸田 尚輝",
+          "color": "default"
+        },
+        {
+          "name": "石原 由里奈",
+          "color": "green"
+        },
+        {
+          "name": "朝倉 信",
+          "color": "yellow"
+        },
+        {
+          "name": "竹本 ひかり",
+          "color": "gray"
+        },
+        {
+          "name": "宮城 叔美",
+          "color": "brown"
+        },
+        {
+          "name": "中根 萌香",
+          "color": "brown"
+        },
+        {
+          "name": "中村 真也",
+          "color": "green"
+        },
+        {
+          "name": "岩崎 真奈美",
+          "color": "blue"
+        },
+        {
+          "name": "赤尾 駿",
+          "color": "green"
+        },
+        {
+          "name": "稲崎 チヅル",
+          "color": "orange"
+        },
+        {
+          "name": "芳村 智子",
+          "color": "purple"
+        },
+        {
+          "name": "八木 菜々実",
+          "color": "gray"
+        },
+        {
+          "name": "関口 颯真",
+          "color": "gray"
+        },
+        {
+          "name": "蓮見 佳奈",
+          "color": "red"
+        },
+        {
+          "name": "石井 しおり",
+          "color": "yellow"
+        },
+        {
+          "name": "青木 遥",
+          "color": "default"
+        },
+        {
+          "name": "荒川 美海",
+          "color": "default"
+        },
+        {
+          "name": "二和田 美緒",
+          "color": "default"
+        },
+        {
+          "name": "柴田 萌",
+          "color": "brown"
+        },
+        {
+          "name": "松井 あやか",
+          "color": "red"
+        },
+        {
+          "name": "小出 哲彰",
+          "color": "red"
+        },
+        {
+          "name": "茂田 千歩",
+          "color": "brown"
+        },
+        {
+          "name": "片岡 万那香",
+          "color": "blue"
+        },
+        {
+          "name": "勝間田 神龍",
+          "color": "default"
+        },
+        {
+          "name": "谷川 沙智代",
+          "color": "gray"
+        },
+        {
+          "name": "雪吹 恭子",
+          "color": "purple"
+        },
+        {
+          "name": "鈴木 花",
+          "color": "red"
+        },
+        {
+          "name": "新保 治佳",
+          "color": "green"
+        },
+        {
+          "name": "石田 まな",
+          "color": "blue"
+        },
+        {
+          "name": "中村 桐子",
+          "color": "purple"
+        },
+        {
+          "name": "日置 星児",
+          "color": "brown"
+        },
+        {
+          "name": "野池 はな",
+          "color": "brown"
+        },
+        {
+          "name": "増田 美玲",
+          "color": "orange"
+        },
+        {
+          "name": "嵐 香南子",
+          "color": "green"
+        },
+        {
+          "name": "大槻 千綾",
+          "color": "pink"
+        },
+        {
+          "name": "綿引 淳奈",
+          "color": "yellow"
+        },
+        {
+          "name": "太田 由美子",
+          "color": "orange"
+        },
+        {
+          "name": "高橋 未紗稀",
+          "color": "yellow"
+        },
+        {
+          "name": "山戸 美玖",
+          "color": "pink"
+        },
+        {
+          "name": "塩原 菜津美",
+          "color": "blue"
+        },
+        {
+          "name": "安達 由佳",
+          "color": "red"
+        },
+        {
+          "name": "関口 亮太",
+          "color": "brown"
+        },
+        {
+          "name": "山下 詩央里",
+          "color": "pink"
+        },
+        {
+          "name": "有田 マリヤム季蓮",
+          "color": "blue"
+        },
+        {
+          "name": "三浦 リオ",
+          "color": "pink"
+        },
+        {
+          "name": "八尋 結菜",
+          "color": "gray"
+        },
+        {
+          "name": "目黒 秀和",
+          "color": "purple"
+        },
+        {
+          "name": "深沢 圭貴",
+          "color": "yellow"
+        },
+        {
+          "name": "五十嵐 千尋",
+          "color": "purple"
+        },
+        {
+          "name": "土屋 遥",
+          "color": "default"
+        },
+        {
+          "name": "都甲 みゆ",
+          "color": "orange"
+        },
+        {
+          "name": "太田 蛍",
+          "color": "red"
+        },
+        {
+          "name": "ooike",
+          "color": "gray"
+        },
+        {
+          "name": "畑 悠菜",
+          "color": "brown"
+        },
+        {
+          "name": "柴﨑愁",
+          "color": "pink"
+        },
+        {
+          "name": "新規タイミー",
+          "color": "purple"
+        },
+        {
+          "name": "中口直子",
+          "color": "brown"
+        },
+        {
+          "name": "近藤里俊",
+          "color": "brown"
+        },
+        {
+          "name": "堀川洋美",
+          "color": "yellow"
+        },
+        {
+          "name": "中島雪絵",
+          "color": "gray"
+        },
+        {
+          "name": "辻田 直佑子",
+          "color": "pink"
+        },
+        {
+          "name": "河井 愛莉",
+          "color": "gray"
+        },
+        {
+          "name": "川口 大輔",
+          "color": "gray"
+        },
+        {
+          "name": "佐久間 雄己",
+          "color": "gray"
+        },
+        {
+          "name": "冨岡 竜之介",
+          "color": "yellow"
+        },
+        {
+          "name": "村岡 秀紀",
+          "color": "red"
+        },
+        {
+          "name": "鈴木 裕介",
+          "color": "blue"
+        },
+        {
+          "name": "松井 優菜",
+          "color": "pink"
+        },
+        {
+          "name": "藤崎 龍也",
+          "color": "orange"
+        },
+        {
+          "name": "武田 実黎",
+          "color": "yellow"
+        },
+        {
+          "name": "中村 紗也香",
+          "color": "yellow"
+        },
+        {
+          "name": "安藤 美雄満",
+          "color": "red"
+        },
+        {
+          "name": "宮原 桃花",
+          "color": "blue"
+        },
+        {
+          "name": "上田 共一",
+          "color": "blue"
+        },
+        {
+          "name": "中村 瑞希",
+          "color": "default"
+        },
+        {
+          "name": "狹川 龍雅",
+          "color": "purple"
+        },
+        {
+          "name": "深澤 祐一",
+          "color": "pink"
+        },
+        {
+          "name": "小島 菜摘",
+          "color": "pink"
+        },
+        {
+          "name": "板垣 由大",
+          "color": "brown"
+        },
+        {
+          "name": "末次 龍太郎",
+          "color": "purple"
+        },
+        {
+          "name": "杉澤 未愛",
+          "color": "yellow"
+        },
+        {
+          "name": "杉田 千絵",
+          "color": "yellow"
+        },
+        {
+          "name": "芳賀 里美",
+          "color": "purple"
+        },
+        {
+          "name": "日比野奈央",
+          "color": "orange"
+        },
+        {
+          "name": "北折健人",
+          "color": "orange"
+        },
+        {
+          "name": "古屋 亮典",
+          "color": "red"
+        },
+        {
+          "name": "原谷 翔",
+          "color": "red"
+        },
+        {
+          "name": "石引 仁康",
+          "color": "default"
+        },
+        {
+          "name": "佐々木 佳奈",
+          "color": "green"
+        },
+        {
+          "name": "奥崎 友美",
+          "color": "gray"
+        },
+        {
+          "name": "飯田 範子",
+          "color": "blue"
+        },
+        {
+          "name": "大場 愛美",
+          "color": "default"
+        },
+        {
+          "name": "山田 一人",
+          "color": "orange"
+        },
+        {
+          "name": "飯塚 絵美子",
+          "color": "blue"
+        },
+        {
+          "name": "平石 眞理",
+          "color": "purple"
+        },
+        {
+          "name": "三浦 美咲",
+          "color": "orange"
+        },
+        {
+          "name": "大塚 柚香里",
+          "color": "orange"
+        },
+        {
+          "name": "野村 健二",
+          "color": "green"
+        },
+        {
+          "name": "瀬本 光一",
+          "color": "green"
+        },
+        {
+          "name": "岩瀬 皓旭",
+          "color": "red"
+        },
+        {
+          "name": "安藤 菜生人",
+          "color": "orange"
+        },
+        {
+          "name": "大竹 桃可",
+          "color": "red"
+        },
+        {
+          "name": "石井 肇",
+          "color": "purple"
+        },
+        {
+          "name": "秋田 隼",
+          "color": "purple"
+        },
+        {
+          "name": "森田 彩咲子",
+          "color": "yellow"
+        },
+        {
+          "name": "池本 拓矢",
+          "color": "red"
+        },
+        {
+          "name": "小松 慧",
+          "color": "red"
+        },
+        {
+          "name": "蘆田 紗和",
+          "color": "purple"
+        },
+        {
+          "name": "有岡 秀郎",
+          "color": "gray"
+        },
+        {
+          "name": "陣内 友希子",
+          "color": "gray"
+        },
+        {
+          "name": "中山 友梨子",
+          "color": "default"
+        },
+        {
+          "name": "大島 早瑛",
+          "color": "green"
+        },
+        {
+          "name": "佐伯 基",
+          "color": "yellow"
+        },
+        {
+          "name": "吉川 苑美",
+          "color": "purple"
+        },
+        {
+          "name": "中山 広志",
+          "color": "blue"
+        },
+        {
+          "name": "塩畑 見咲",
+          "color": "brown"
+        },
+        {
+          "name": "佐藤 良亮",
+          "color": "pink"
+        },
+        {
+          "name": "水落 礼美",
+          "color": "pink"
+        },
+        {
+          "name": "相宅 志保",
+          "color": "red"
+        },
+        {
+          "name": "加藤 優子",
+          "color": "gray"
+        },
+        {
+          "name": "神田 聖ら",
+          "color": "gray"
+        },
+        {
+          "name": "豊田 貢平",
+          "color": "red"
+        },
+        {
+          "name": "村尾 千晶",
+          "color": "green"
+        },
+        {
+          "name": "瀬戸 颯人",
+          "color": "gray"
+        },
+        {
+          "name": "伊藤 彩加",
+          "color": "gray"
+        },
+        {
+          "name": "谷口 茜",
+          "color": "purple"
+        },
+        {
+          "name": "池田 由紀",
+          "color": "pink"
+        },
+        {
+          "name": "小笠原隆暉",
+          "color": "green"
+        },
+        {
+          "name": "三浦 雄介",
+          "color": "brown"
+        },
+        {
+          "name": "高橋　彩乃",
+          "color": "orange"
+        },
+        {
+          "name": "中根萌香",
+          "color": "purple"
+        },
+        {
+          "name": "齋藤 結花",
+          "color": "purple"
+        },
+        {
+          "name": "持田 日菜",
+          "color": "red"
+        },
+        {
+          "name": "満井 雄也",
+          "color": "green"
+        },
+        {
+          "name": "佐野 守海",
+          "color": "purple"
+        },
+        {
+          "name": "上江洲 志龍",
+          "color": "green"
+        },
+        {
+          "name": "中村 澪奈",
+          "color": "orange"
+        },
+        {
+          "name": "佐藤 野乃子",
+          "color": "red"
+        },
+        {
+          "name": "塩本 朋花",
+          "color": "yellow"
+        },
+        {
+          "name": "小野 詩織",
+          "color": "brown"
+        },
+        {
+          "name": "森成 直央",
+          "color": "red"
+        },
+        {
+          "name": "水谷 彰徳",
+          "color": "gray"
+        },
+        {
+          "name": "蒲地 穣",
+          "color": "red"
+        },
+        {
+          "name": "山本 結心",
+          "color": "purple"
+        },
+        {
+          "name": "横田 茉日向",
+          "color": "purple"
+        },
+        {
+          "name": "三崎 美香子",
+          "color": "orange"
+        },
+        {
+          "name": "鈴木 友萌",
+          "color": "brown"
+        },
+        {
+          "name": "久米 雄斗",
+          "color": "gray"
+        },
+        {
+          "name": "遠藤 翔太",
+          "color": "red"
+        },
+        {
+          "name": "棚橋 広翔",
+          "color": "blue"
+        },
+        {
+          "name": "松山 朱李",
+          "color": "green"
+        },
+        {
+          "name": "山﨑 菜央",
+          "color": "red"
+        },
+        {
+          "name": "大竹 彩可",
+          "color": "pink"
+        },
+        {
+          "name": "山崎 夏香",
+          "color": "gray"
+        },
+        {
+          "name": "篠原 ほのか",
+          "color": "yellow"
+        },
+        {
+          "name": "國田佳恵",
+          "color": "brown"
+        },
+        {
+          "name": "狭川龍雅",
+          "color": "red"
+        },
+        {
+          "name": "谷本栞南",
+          "color": "yellow"
+        },
+        {
+          "name": "川島 璃子",
+          "color": "red"
+        },
+        {
+          "name": "五十川雅茂",
+          "color": "green"
+        },
+        {
+          "name": "久利 穂乃果",
+          "color": "orange"
+        },
+        {
+          "name": "竹永 美咲",
+          "color": "purple"
+        },
+        {
+          "name": "五十川 雅茂",
+          "color": "brown"
+        },
+        {
+          "name": "宮崎 裕真",
+          "color": "yellow"
+        },
+        {
+          "name": "林 啓太",
+          "color": "default"
+        },
+        {
+          "name": "菅原 茉紘",
+          "color": "pink"
+        },
+        {
+          "name": "恵美 翔太",
+          "color": "green"
+        },
+        {
+          "name": "戸羽 瑛理奈",
+          "color": "purple"
+        },
+        {
+          "name": "伊賀 埜々花",
+          "color": "blue"
+        },
+        {
+          "name": "大坪 要",
+          "color": "brown"
+        },
+        {
+          "name": "前田 ゆり",
+          "color": "yellow"
+        },
+        {
+          "name": "増田 義一",
+          "color": "orange"
+        },
+        {
+          "name": "伊藤幸子",
+          "color": "yellow"
+        },
+        {
+          "name": "又木 博義",
+          "color": "brown"
+        },
+        {
+          "name": "依田恵",
+          "color": "orange"
+        },
+        {
+          "name": "市村 祐真",
+          "color": "orange"
+        },
+        {
+          "name": "山口成子",
+          "color": "gray"
+        },
+        {
+          "name": "岩田 充弘",
+          "color": "default"
+        },
+        {
+          "name": "野島 久美子",
+          "color": "green"
+        },
+        {
+          "name": "佐々木 優香",
+          "color": "default"
+        },
+        {
+          "name": "中林 亜沙子",
+          "color": "gray"
+        },
+        {
+          "name": "瀬田 浩大",
+          "color": "pink"
+        }
+      ]
+    },
+    "記事コンテンツ管理DB 1": {
+      "type": "relation",
+      "id": "y%3C_o",
+      "related_database_id": "2c555ca3-262c-4f20-b818-dcf782017538",
+      "type_config": "dual_property"
+    },
+    "発注決裁名": {
+      "type": "title",
+      "id": "title"
+    }
+  }
+}
