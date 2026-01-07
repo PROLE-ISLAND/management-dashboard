@@ -2,16 +2,20 @@
 # CodeQL Security Analysis
 # 静的セキュリティ解析（SAST）- Python
 # =====================================================
+#
+# 注意: GitHub Advanced Securityが有効な場合のみ動作
+# - パブリックリポジトリ: 無料
+# - プライベートリポジトリ: GitHub Advanced Security (GHAS) が必要
+#
+# 有効化: Settings → Security → Code scanning → Set up → Enable
 
 name: セキュリティ分析
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+  # Advanced Security無効時はscheduleでも失敗するので手動実行のみ
+  workflow_dispatch:
   schedule:
-    - cron: '0 3 * * 1'  # 毎週月曜 12:00 JST
+    - cron: '0 3 * * 1'  # 毎週月曜 12:00 JST（Advanced Security有効時のみ）
 
 permissions:
   contents: read
