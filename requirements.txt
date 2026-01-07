@@ -1,2 +1,13 @@
+# Core
+reflex>=0.8.24
+reflex-ag-grid>=0.0.11
 
-reflex==0.8.24.post1
+# Database
+sqlalchemy>=2.0.0
+
+# Development
+ruff>=0.8.0
+mypy>=1.13.0
+pytest>=8.0.0
+pytest-cov>=6.0.0
+pytest-asyncio>=0.24.0

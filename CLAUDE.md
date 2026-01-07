@@ -1,12 +1,50 @@
 # プロジェクト固有の開発ルール
 
-<!-- このセクションをプロジェクトに合わせて編集 -->
+## プロジェクト概要
+**経営指標モニタリング＆予算管理ダッシュボード**
+- Retoolの代替として、コードファーストで開発可能なダッシュボードを構築
+- スプレッドシートライクな入力体験を提供
+- Claude Code (Vibe Coding) との高い親和性
 
 ## 技術スタック
-- Next.js 15+ (App Router)
-- TypeScript
-- Tailwind CSS v4
-- shadcn/ui
+- **Reflex** 0.8+ (Python Web Framework)
+- **Python** 3.11+
+- **AG Grid** (reflex-ag-grid) - スプレッドシート式編集
+- **SQLAlchemy** - DB接続（PostgreSQL/SQLite）
+
+## 開発環境セットアップ
+```bash
+cd ~/projects/management-dashboard
+source .venv/bin/activate
+pip install -r requirements.txt
+reflex run
+```
+
+## コマンド一覧
+| コマンド | 説明 |
+|---------|------|
+| `reflex run` | 開発サーバー起動 |
+| `reflex export` | 本番ビルド |
+| `ruff check .` | Lint実行 |
+| `ruff format .` | フォーマット |
+| `mypy management_dashboard/` | 型チェック |
+| `pytest tests/` | テスト実行 |
+
+## ディレクトリ構成
+```
+management-dashboard/
+├── management_dashboard/    # アプリ本体
+│   ├── __init__.py
+│   ├── management_dashboard.py  # メインエントリ
+│   ├── components/          # UIコンポーネント
+│   ├── pages/              # ページ
+│   └── state/              # 状態管理
+├── tests/                  # テスト
+├── .github/workflows/      # CI/CD
+├── requirements.txt        # 依存関係
+├── pyproject.toml          # ruff/mypy設定
+└── rxconfig.py             # Reflex設定
+```
 
 ---
 
