@@ -1,0 +1,130 @@
+name: Bug Report
+description: バグ報告・不具合報告
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## バグ報告テンプレート
+
+        📚 参考: [テスト戦略](https://github.com/PROLE-ISLAND/.github/wiki/テスト戦略) | [DoD基準](https://github.com/PROLE-ISLAND/.github/blob/main/DoD_STANDARDS.md)
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 優先度
+      description: バグの深刻度を選択
+      options:
+        - P0: Critical (本番障害・売上影響)
+        - P1: High (主要機能停止)
+        - P2: Medium (機能劣化)
+        - P3: Low (軽微な問題)
+      default: 2
+    validations:
+      required: true
+
+  - type: dropdown
+    id: dod_level
+    attributes:
+      label: DoD Level（修正の品質基準）
+      description: |
+        修正PRに求める品質レベル。
+        詳細: https://github.com/PROLE-ISLAND/.github/blob/main/DoD_STANDARDS.md
+      options:
+        - Bronze (27観点・80%カバレッジ) ← 緊急修正
+        - Silver (31観点・85%カバレッジ) ← 推奨
+        - Gold (19観点・95%カバレッジ) ← 重要機能
+      default: 1
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: バグの説明
+      description: 何が起きているか説明してください
+      placeholder: |
+        期待する動作：〇〇
+        実際の動作：〇〇
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 再現手順
+      description: バグを再現する手順
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 環境情報
+      description: 発生環境の情報
+      placeholder: |
+        - OS: macOS / Windows / Linux
+        - ブラウザ: Chrome / Firefox / Safari
+        - バージョン:
+        - URL:
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: エラーログ・スクリーンショット
+      description: エラーメッセージやスクリーンショットがあれば添付
+
+  - type: dropdown
+    id: gold_impact
+    attributes:
+      label: Gold E2E への影響
+      description: |
+        このバグは Gold E2E テストに影響するか？
+        参考: https://github.com/PROLE-ISLAND/.github/wiki/Goldテストチャーター
+      options:
+        - 影響なし（既存テストでカバー済み）
+        - 影響あり（既存 Gold テストが失敗する可能性）
+        - 新規 Gold 候補（主要フローのバグ）
+        - 不明
+      default: 3
+    validations:
+      required: true
+
+  - type: input
+    id: usecase_id
+    attributes:
+      label: 関連ユースケース ID（該当時のみ）
+      description: |
+        Gold E2E に影響がある場合、関連する UC-ID を記入。
+        参考: https://github.com/PROLE-ISLAND/.github/wiki/ユースケースユニバース
+      placeholder: "UC-001, UC-002"
+
+  - type: textarea
+    id: impact_scope
+    attributes:
+      label: 影響範囲
+      description: このバグが影響している範囲
+      value: |
+        ### 影響を受けている機能
+        -
+
+        ### 関連ファイル（推定）
+        -
+
+        ### 影響度
+        - [ ] 全ユーザーに影響
+        - [ ] 特定条件のユーザーのみ
+        - [ ] 開発環境のみ
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: 事前確認
+      options:
+        - label: 重複Issueがないことを確認しました
+          required: true

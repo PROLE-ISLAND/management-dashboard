@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Wiki（開発ガイド）
+    url: https://github.com/PROLE-ISLAND/.github/wiki
+    about: 開発標準・DoD基準・テスト戦略などのガイド
+  - name: DoD基準（品質標準）
+    url: https://github.com/PROLE-ISLAND/.github/blob/main/DoD_STANDARDS.md
+    about: Bronze/Silver/Gold 77観点の品質基準
+  - name: Discussions（質問・議論）
+    url: https://github.com/orgs/PROLE-ISLAND/discussions
+    about: 質問や議論はこちらで
