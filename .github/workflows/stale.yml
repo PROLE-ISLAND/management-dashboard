@@ -1,0 +1,32 @@
+# =====================================================
+# Stale Issues/PRs
+# 組織の Reusable Workflow を呼び出す薄いラッパー
+# =====================================================
+#
+# ロジックは組織リポジトリで一元管理:
+# PROLE-ISLAND/.github/.github/workflows/reusable-stale.yml
+
+name: "🧹 古いIssue/PR処理"
+
+on:
+  schedule:
+    # 毎日 9:00 JST に実行
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    uses: PROLE-ISLAND/.github/.github/workflows/reusable-stale.yml@main
+    with:
+      language: 'ja'
+      days_before_issue_stale: 30
+      days_before_issue_close: 7
+      days_before_pr_stale: 14
+      days_before_pr_close: 7
+      exempt_issue_labels: 'P0: Critical,P1: High,blocked,in-progress,decision'
+      exempt_pr_labels: 'blocked,in-progress'
+      operations_per_run: 100

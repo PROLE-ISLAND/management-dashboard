@@ -1,0 +1,72 @@
+# =====================================================
+# 自動リリース（Python/Semantic Versioning）
+# mainへのマージ時にバージョン判定・リリース作成
+# =====================================================
+#
+# Conventional Commits に基づいてバージョンを自動決定:
+# - feat: → minor version bump
+# - fix: → patch version bump
+# - BREAKING CHANGE: → major version bump
+
+name: "🚀 リリース"
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: "🚀 自動リリース"
+    runs-on: ubuntu-latest
+    # リリースコミット自体では実行しない
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 🟢 Setup Node.js (for semantic-release)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 📦 Install semantic-release
+        run: |
+          npm install -g semantic-release @semantic-release/changelog @semantic-release/git
+
+      - name: 🔍 Verify conditions
+        run: |
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Actor: ${{ github.actor }}"
+
+      - name: 🚀 Semantic Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_AUTHOR_NAME: github-actions[bot]
+          GIT_AUTHOR_EMAIL: github-actions[bot]@users.noreply.github.com
+          GIT_COMMITTER_NAME: github-actions[bot]
+          GIT_COMMITTER_EMAIL: github-actions[bot]@users.noreply.github.com
+        run: npx semantic-release
+        continue-on-error: true  # 初期段階では .releaserc がない場合がある
+
+      - name: 📊 Release Summary
+        if: success()
+        run: |
+          echo "## 🎉 Release completed!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Check the [Releases](https://github.com/${{ github.repository }}/releases) page for details." >> $GITHUB_STEP_SUMMARY

@@ -22,8 +22,15 @@ jobs:
             const branch = context.payload.pull_request.head.ref;
             const validPatterns = [
               /^feature\/issue-\d+-/,
+              /^feat\/issue-\d+-/,
               /^bugfix\/issue-\d+-/,
               /^hotfix\/issue-\d+-/,
+              /^fix\/issue-\d+-/,
+              /^requirements\/issue-\d+-/,
+              /^plan\/issue-\d+-/,
+              /^chore\//,
+              /^docs\//,
+              /^ci\//,
               /^dependabot\//,
               /^renovate\//,
             ];

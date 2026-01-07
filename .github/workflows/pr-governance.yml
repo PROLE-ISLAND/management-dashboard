@@ -1,0 +1,37 @@
+# =====================================================
+# PR Governance
+# 組織の Reusable Workflow を呼び出す薄いラッパー
+# =====================================================
+#
+# ロジックは組織リポジトリで一元管理:
+# PROLE-ISLAND/.github/.github/workflows/reusable-pr-governance.yml
+#
+# 機能:
+# - PR品質チェック（Why必須、ブランチ命名規則）
+# - 自動ラベリング（変更ファイルに応じて）
+# - 変更サマリー生成
+# - UIコンポーネントバリアントチェック
+
+name: "🛡️ PRガバナンス"
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  governance:
+    # type:requirements ラベル付きPRはスキップ（要件定義PRは異なる構造を持つため）
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'type:requirements') }}
+    uses: PROLE-ISLAND/.github/.github/workflows/reusable-pr-governance.yml@main
+    with:
+      language: 'ja'
+      require_why_section: true
+      require_issue_branch: true
+      enable_auto_labeler: true
+      enable_change_summary: true
+      enable_variant_check: true
+      size_thresholds: '{"small": 100, "large": 500}'

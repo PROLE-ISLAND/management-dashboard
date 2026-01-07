@@ -1,0 +1,103 @@
+# =====================================================
+# Auto Labeler Configuration
+# ファイルパスに基づく自動ラベリング (Python/Reflex)
+# Ref: https://github.com/actions/labeler
+# =====================================================
+
+# === ドメインラベル（ファイルパスベース） ===
+frontend:
+  - changed-files:
+      - any-glob-to-any-file:
+        - 'management_dashboard/**/*.py'
+        - 'assets/**'
+        - '**/*.css'
+
+backend:
+  - changed-files:
+      - any-glob-to-any-file:
+        - 'management_dashboard/**/*.py'
+        - 'api/**'
+
+database:
+  - changed-files:
+      - any-glob-to-any-file:
+        - 'alembic/**'
+        - 'migrations/**'
+        - '**/models.py'
+        - '**/database.py'
+
+# === type: ラベル（ブランチ名ベース） ===
+'type:requirements':
+  - head-branch: ['^requirements/', '^plan/', '^design/']
+
+'type:implementation':
+  - head-branch: ['^feature/', '^feat/']
+
+'type:docs':
+  - head-branch: ['^docs/', '^documentation/']
+  - changed-files:
+      - all-globs-to-all-files:
+        - '**/*.md'
+        - 'docs/**'
+
+'type:refactor':
+  - head-branch: ['^refactor/']
+
+'type:bugfix':
+  - head-branch: ['^bugfix/', '^hotfix/', '^fix/']
+
+# === ci: ラベル（ファイルパスベース） ===
+'ci:skip':
+  - changed-files:
+      - all-globs-to-all-files:
+        - '**/*.md'
+        - '!README.md'
+        - '.github/*.md'
+
+'ci:e2e':
+  - changed-files:
+      - any-glob-to-any-file:
+        - 'e2e/**'
+        - 'tests/e2e/**'
+        - 'playwright.config.*'
+        - 'management_dashboard/**/*.py'
+
+# === risk: ラベル ===
+'risk:migration':
+  - changed-files:
+      - any-glob-to-any-file:
+        - 'alembic/**'
+        - 'migrations/**'
+
+'risk:breaking':
+  - changed-files:
+      - any-glob-to-any-file:
+        - 'management_dashboard/models/**'
+        - 'pyproject.toml'
+        - 'requirements.txt'
+
+# === 設定・インフラ ===
+config:
+  - changed-files:
+      - any-glob-to-any-file:
+        - '.github/**'
+        - '*.toml'
+        - '*.cfg'
+        - '.env*'
+        - 'rxconfig.py'
+
+infrastructure:
+  - changed-files:
+      - any-glob-to-any-file:
+        - 'Dockerfile*'
+        - 'docker-compose*'
+        - '.dockerignore'
+
+# === テスト ===
+tests:
+  - changed-files:
+      - any-glob-to-any-file:
+        - 'tests/**'
+        - 'e2e/**'
+        - 'conftest.py'
+        - 'pytest.ini'

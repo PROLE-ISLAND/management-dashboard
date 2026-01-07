@@ -1,0 +1,43 @@
+# =====================================================
+# 自動承認 ワークフロー
+# 安全なPRタイプ（chore, deps, docs, ci）の自動承認
+# Dependabot / Renovate PRも対応
+# =====================================================
+
+name: 自動承認
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  auto-approve:
+    runs-on: ubuntu-latest
+    # 安全なPRタイプのみ自動承認
+    # 必須シークレット: APPROVE_PAT (repo, write:discussion スコープのPAT)
+    if: |
+      (
+        github.actor == 'ryu1aida1126' ||
+        github.actor == 'dependabot[bot]' ||
+        github.actor == 'renovate[bot]'
+      ) &&
+      (
+        startsWith(github.head_ref, 'chore/') ||
+        startsWith(github.head_ref, 'deps/') ||
+        startsWith(github.head_ref, 'docs/') ||
+        startsWith(github.head_ref, 'fix/sync') ||
+        startsWith(github.head_ref, 'ci/') ||
+        startsWith(github.head_ref, 'dependabot/') ||
+        startsWith(github.head_ref, 'renovate/')
+      )
+    steps:
+      - name: 自動承認
+        uses: hmarr/auto-approve-action@v4
+        with:
+          # PATが必要（組織設定でGITHUB_TOKENによる承認が禁止されているため）
+          # Settings → Secrets → APPROVE_PAT を設定すること
+          github-token: ${{ secrets.APPROVE_PAT || secrets.GITHUB_TOKEN }}
+          review-message: "🤖 安全なPRタイプのため自動承認"
