@@ -116,8 +116,10 @@ interface RowData {
   isLeaf: boolean                         // True if this row is editable (no expanded children)
   dimensionType: DimensionType            // The dimension type for this row
   dimensionValue: string                  // The dimension value for this row
-  amounts: Record<string, number>         // Actual amounts
+  amounts: Record<string, number>         // Actual amounts (daily)
   budgetAmounts: Record<string, number>   // Budget amounts (daily prorated)
+  monthlyActuals: Record<string, number>  // Actual amounts (monthly, for yearly view)
+  monthlyBudgets: Record<string, number>  // Budget amounts (monthly, for yearly view)
   total: number                            // Actual total for period
   budgetTotal: number                      // Budget total for period
   monthlyBudget: number                   // Monthly budget for editing (or sum of children)
@@ -364,6 +366,8 @@ export function AccountingTable({ data, budgets, centerDate, periodStart, period
 
         const amounts: Record<string, number> = {}
         const budgetAmounts: Record<string, number> = {}
+        const monthlyActuals: Record<string, number> = {}
+        const monthlyBudgets: Record<string, number> = {}
 
         dates.forEach(date => {
           const dateKey = formatDateKey(date)
@@ -375,10 +379,21 @@ export function AccountingTable({ data, budgets, centerDate, periodStart, period
             : 0
         })
 
+        // Initialize monthly actuals and budgets for yearly view
+        months.forEach(m => {
+          monthlyActuals[m.key] = 0
+          monthlyBudgets[m.key] = getMonthlyBudgetForYearMonth(dimension, value, m.key)
+        })
+
         matchingOrders.forEach(order => {
           const dateKey = order.date.split("T")[0]
           if (amounts[dateKey] !== undefined) {
             amounts[dateKey] += order.amount
+          }
+          // Also aggregate by month for yearly view
+          const yearMonth = dateKey.substring(0, 7)
+          if (monthlyActuals[yearMonth] !== undefined) {
+            monthlyActuals[yearMonth] += order.amount
           }
         })
 
@@ -403,21 +418,35 @@ export function AccountingTable({ data, budgets, centerDate, periodStart, period
           dimensionValue: value,
           amounts,
           budgetAmounts,
+          monthlyActuals,
+          monthlyBudgets,
           total,
           budgetTotal,
           monthlyBudget: getMonthlyBudget(dimension, value),
         })
 
-        if (hasChildren && isExpanded) {
+        // If has children, always calculate children sums (for subtotal display even when collapsed)
+        if (hasChildren) {
           const childStartIndex = rows.length
+
+          // Temporarily collect child data to calculate sums
+          // We'll remove them later if not expanded
           collectHierarchy(matchingOrders, dimIndex + 1, currentLabels)
+
           const childEndIndex = rows.length
 
-          // Sum children's budgets for this parent (bottom-up)
+          // Sum children's values for this parent (bottom-up)
           let childrenMonthlyBudgetSum = 0
           const childrenDailyBudgetSums: Record<string, number> = {}
+          const childrenMonthlyActualSums: Record<string, number> = {}
+          const childrenMonthlyBudgetSums: Record<string, number> = {}
+
           dates.forEach(date => {
             childrenDailyBudgetSums[formatDateKey(date)] = 0
+          })
+          months.forEach(m => {
+            childrenMonthlyActualSums[m.key] = 0
+            childrenMonthlyBudgetSums[m.key] = 0
           })
 
           // Only sum immediate children (same level + 1)
@@ -427,23 +456,37 @@ export function AccountingTable({ data, budgets, centerDate, periodStart, period
               Object.entries(rows[i].budgetAmounts).forEach(([dateKey, amount]) => {
                 childrenDailyBudgetSums[dateKey] += amount
               })
+              // Sum monthly actuals and budgets for yearly view
+              Object.entries(rows[i].monthlyActuals).forEach(([monthKey, amount]) => {
+                childrenMonthlyActualSums[monthKey] += amount
+              })
+              Object.entries(rows[i].monthlyBudgets).forEach(([monthKey, amount]) => {
+                childrenMonthlyBudgetSums[monthKey] += amount
+              })
             }
           }
 
           // Update parent row with children's sums
           rows[rowIndex].monthlyBudget = childrenMonthlyBudgetSum
           rows[rowIndex].budgetAmounts = childrenDailyBudgetSums
+          rows[rowIndex].monthlyActuals = childrenMonthlyActualSums
+          rows[rowIndex].monthlyBudgets = childrenMonthlyBudgetSums
           rows[rowIndex].budgetTotal = Object.entries(childrenDailyBudgetSums).reduce(
             (sum, [dateKey, val]) => isInPeriod(dateKey) ? sum + val : sum,
             0
           )
+
+          // If not expanded, remove the children rows (we only needed them for sum calculation)
+          if (!isExpanded) {
+            rows.splice(childStartIndex, childEndIndex - childStartIndex)
+          }
         }
       })
     }
 
     collectHierarchy(data, 0)
     return rows
-  }, [data, dimensions, dates, expandedRows, isInPeriod, getDailyBudgetForDate, getMonthlyBudget])
+  }, [data, dimensions, dates, months, expandedRows, isInPeriod, getDailyBudgetForDate, getMonthlyBudget, getMonthlyBudgetForYearMonth])
 
   // Implement fill down function (needs rowsData)
   const saveBudgetFillDown = React.useCallback(async (currentRowKey: string, yearMonth: string) => {
@@ -634,7 +677,7 @@ export function AccountingTable({ data, budgets, centerDate, periodStart, period
     setEditingCell(null)
   }, [viewMode, timeGranularity, leafRows, months.length])
 
-  // Calculate column totals (actual and budget) - only leaf rows (daily view)
+  // Calculate column totals (actual and budget) - sum top-level rows only (daily view)
   const { columnTotals, columnBudgetTotals } = React.useMemo(() => {
     const totals: Record<string, number> = {}
     const budgetTotals: Record<string, number> = {}
@@ -645,8 +688,9 @@ export function AccountingTable({ data, budgets, centerDate, periodStart, period
       budgetTotals[dateKey] = 0
     })
 
+    // Sum from top-level rows only (they contain children sums when collapsed)
     rowsData.forEach(row => {
-      if (row.isLeaf) {
+      if (row.level === 0) {
         Object.entries(row.amounts).forEach(([dateKey, amount]) => {
           totals[dateKey] += amount
         })
@@ -693,6 +737,7 @@ export function AccountingTable({ data, budgets, centerDate, periodStart, period
   }, [data, dimensions, months])
 
   // Calculate yearly column totals
+  // Only sum top-level rows (level 0) to avoid double-counting when hierarchies are involved
   const { yearlyColumnTotals, yearlyColumnBudgetTotals } = React.useMemo(() => {
     const totals: Record<string, number> = {}
     const budgetTotals: Record<string, number> = {}
@@ -702,22 +747,18 @@ export function AccountingTable({ data, budgets, centerDate, periodStart, period
       budgetTotals[m.key] = 0
     })
 
-    // Sum actual amounts
+    // Sum from top-level rows only (they contain children sums when collapsed)
     rowsData.forEach(row => {
-      if (row.isLeaf) {
+      if (row.level === 0) {
         months.forEach(m => {
-          const dimMap = yearlyRowData.monthlyActuals.get(row.dimensionType)
-          const monthlyAmounts = dimMap?.get(row.dimensionValue)
-          if (monthlyAmounts) {
-            totals[m.key] += monthlyAmounts[m.key] || 0
-          }
-          budgetTotals[m.key] += getMonthlyBudgetForYearMonth(row.dimensionType, row.dimensionValue, m.key)
+          totals[m.key] += row.monthlyActuals[m.key] || 0
+          budgetTotals[m.key] += row.monthlyBudgets[m.key] || 0
         })
       }
     })
 
     return { yearlyColumnTotals: totals, yearlyColumnBudgetTotals: budgetTotals }
-  }, [rowsData, months, yearlyRowData, getMonthlyBudgetForYearMonth])
+  }, [rowsData, months])
 
   // Calculate yearly grand totals
   const yearlyGrandTotal = Object.values(yearlyColumnTotals).reduce((sum, val) => sum + val, 0)
@@ -732,10 +773,10 @@ export function AccountingTable({ data, budgets, centerDate, periodStart, period
     return isInPeriod(dateKey) ? sum + val : sum
   }, 0)
 
-  // Sum of monthly budgets (for budget mode total display) - only leaf rows
+  // Sum of monthly budgets (for budget mode total display) - sum top-level rows only
   const grandMonthlyBudgetTotal = React.useMemo(() => {
     return rowsData
-      .filter(row => row.isLeaf)
+      .filter(row => row.level === 0)
       .reduce((sum, row) => sum + row.monthlyBudget, 0)
   }, [rowsData])
 
@@ -964,8 +1005,8 @@ export function AccountingTable({ data, budgets, centerDate, periodStart, period
           <table ref={tableRef} className="w-max border-collapse">
             <thead className="sticky top-0 z-20">
               <tr>
-                {/* Sticky left header - solid background */}
-                <th className="sticky left-0 z-30 bg-card border-r-2 border-border px-4 py-3 text-left text-sm font-semibold min-w-[200px]">
+                {/* Sticky left header - solid background with fixed border line */}
+                <th className="sticky left-0 z-30 bg-card px-4 py-3 text-left text-sm font-semibold min-w-[200px] after:content-[''] after:absolute after:right-0 after:top-0 after:bottom-0 after:w-[2px] after:bg-foreground/20 after:shadow-[2px_0_4px_-2px_rgba(0,0,0,0.15)]">
                   {dimensions.map((dim, i) => {
                     const config = DIMENSION_OPTIONS.find(d => d.id === dim)
                     return (
@@ -1049,8 +1090,8 @@ export function AccountingTable({ data, budgets, centerDate, periodStart, period
                   )
                 })}
 
-                {/* Sticky right header - solid background */}
-                <th className="sticky right-0 z-30 bg-card border-l-2 border-border px-4 py-3 text-center text-sm font-semibold min-w-[130px]">
+                {/* Sticky right header - solid background with fixed border line */}
+                <th className="sticky right-0 z-30 bg-card px-4 py-3 text-center text-sm font-semibold min-w-[130px] before:content-[''] before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[2px] before:bg-foreground/20 before:shadow-[-2px_0_4px_-2px_rgba(0,0,0,0.15)]">
                   {timeGranularity === "yearly"
                     ? "年間合計"
                     : viewMode === "budget"
@@ -1065,19 +1106,21 @@ export function AccountingTable({ data, budgets, centerDate, periodStart, period
             <tbody>
               {rowsData.map((row, rowIndex) => {
                 const rowBg = rowIndex % 2 === 0 ? "bg-card" : "bg-muted/50"
+                // Solid background for sticky columns (no transparency)
+                const stickyRowBg = rowIndex % 2 === 0 ? "bg-card" : "bg-muted"
                 return (
                   <tr
                     key={row.key}
                     className={cn("border-t border-border", rowBg)}
                   >
-                    {/* Sticky left cell - solid background */}
+                    {/* Sticky left cell - solid background with fixed border line */}
                     {(() => {
                       const canSelectRow = viewMode === "budget" && timeGranularity === "yearly" && row.isLeaf && onBudgetChange
                       return (
                         <td
                           className={cn(
-                            "sticky left-0 z-10 border-r-2 border-border px-4 py-2.5 text-sm",
-                            rowBg,
+                            "sticky left-0 z-10 px-4 py-2.5 text-sm after:content-[''] after:absolute after:right-0 after:top-0 after:bottom-0 after:w-[2px] after:bg-foreground/20 after:shadow-[2px_0_4px_-2px_rgba(0,0,0,0.15)]",
+                            stickyRowBg,
                             canSelectRow && "cursor-pointer"
                           )}
                           onDoubleClick={canSelectRow ? () => handleRowDoubleClick(row.key) : undefined}
@@ -1148,10 +1191,10 @@ export function AccountingTable({ data, budgets, centerDate, periodStart, period
 
                     {/* Month cells (yearly view) */}
                     {timeGranularity === "yearly" && months.map((m, monthIndex) => {
-                      const dimMap = yearlyRowData.monthlyActuals.get(row.dimensionType)
-                      const monthlyAmounts = dimMap?.get(row.dimensionValue)
-                      const actual = monthlyAmounts?.[m.key] || 0
-                      const budget = getMonthlyBudgetForYearMonth(row.dimensionType, row.dimensionValue, m.key)
+                      // Use row.monthlyActuals and row.monthlyBudgets which already contain correct values
+                      // (children sum for parents, own values for leaves)
+                      const actual = row.monthlyActuals[m.key] || 0
+                      const budget = row.monthlyBudgets[m.key] || 0
                       const displayValue = getDisplayValue(actual, budget)
                       const currentMonth = new Date().getMonth()
                       const currentYear = new Date().getFullYear()
@@ -1193,14 +1236,9 @@ export function AccountingTable({ data, budgets, centerDate, periodStart, period
                       const cellKey = `budget-${row.key}`
                       const isEditing = editingCell === cellKey
 
-                      // Calculate yearly totals for this row
-                      const dimMap = yearlyRowData.monthlyActuals.get(row.dimensionType)
-                      const monthlyAmounts = dimMap?.get(row.dimensionValue)
-                      const yearlyActual = monthlyAmounts
-                        ? Object.values(monthlyAmounts).reduce((sum, val) => sum + val, 0)
-                        : 0
-                      const yearlyBudget = months.reduce((sum, m) =>
-                        sum + getMonthlyBudgetForYearMonth(row.dimensionType, row.dimensionValue, m.key), 0)
+                      // Calculate yearly totals for this row (using pre-computed values)
+                      const yearlyActual = Object.values(row.monthlyActuals).reduce((sum, val) => sum + val, 0)
+                      const yearlyBudget = Object.values(row.monthlyBudgets).reduce((sum, val) => sum + val, 0)
 
                       const displayTotal = timeGranularity === "yearly"
                         ? getDisplayValue(yearlyActual, yearlyBudget)
@@ -1212,8 +1250,8 @@ export function AccountingTable({ data, budgets, centerDate, periodStart, period
                         if (row.isLeaf) {
                           return (
                             <td className={cn(
-                              "sticky right-0 z-10 border-l-2 border-border px-2 py-1.5 text-right text-sm font-semibold tabular-nums",
-                              rowBg
+                              "sticky right-0 z-10 px-2 py-1.5 text-right text-sm font-semibold tabular-nums before:content-[''] before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[2px] before:bg-foreground/20 before:shadow-[-2px_0_4px_-2px_rgba(0,0,0,0.15)]",
+                              stickyRowBg
                             )}>
                               {isEditing ? (
                                 <div className="flex items-center gap-1">
@@ -1259,8 +1297,8 @@ export function AccountingTable({ data, budgets, centerDate, periodStart, period
                         // Parent rows show sum of children (read-only, with Σ indicator)
                         return (
                           <td className={cn(
-                            "sticky right-0 z-10 border-l-2 border-border px-4 py-2.5 text-right text-sm font-semibold tabular-nums",
-                            rowBg,
+                            "sticky right-0 z-10 px-4 py-2.5 text-right text-sm font-semibold tabular-nums before:content-[''] before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[2px] before:bg-foreground/20 before:shadow-[-2px_0_4px_-2px_rgba(0,0,0,0.15)]",
+                            stickyRowBg,
                             "text-muted-foreground"
                           )}>
                             <span className="text-xs mr-1">Σ</span>
@@ -1272,8 +1310,8 @@ export function AccountingTable({ data, budgets, centerDate, periodStart, period
                       // Actual or variance mode - read-only
                       return (
                         <td className={cn(
-                          "sticky right-0 z-10 border-l-2 border-border px-4 py-2.5 text-right text-sm font-semibold tabular-nums",
-                          rowBg,
+                          "sticky right-0 z-10 px-4 py-2.5 text-right text-sm font-semibold tabular-nums before:content-[''] before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[2px] before:bg-foreground/20 before:shadow-[-2px_0_4px_-2px_rgba(0,0,0,0.15)]",
+                          stickyRowBg,
                           getVarianceStyle(row.total, row.budgetTotal)
                         )}>
                           {displayTotal !== 0
@@ -1288,7 +1326,7 @@ export function AccountingTable({ data, budgets, centerDate, periodStart, period
 
               {/* Total Row - sticky bottom */}
               <tr className="border-t-2 border-border font-semibold sticky bottom-0 z-10">
-                <td className="sticky left-0 z-20 bg-card border-r-2 border-border px-4 py-3 text-sm">
+                <td className="sticky left-0 z-20 bg-card px-4 py-3 text-sm after:content-[''] after:absolute after:right-0 after:top-0 after:bottom-0 after:w-[2px] after:bg-foreground/20 after:shadow-[2px_0_4px_-2px_rgba(0,0,0,0.15)]">
                   合計
                 </td>
 
@@ -1359,7 +1397,7 @@ export function AccountingTable({ data, budgets, centerDate, periodStart, period
                       : getDisplayValue(grandTotal, grandBudgetTotal)
                   return (
                     <td className={cn(
-                      "sticky right-0 z-20 border-l-2 border-border px-4 py-3 text-right text-sm font-bold tabular-nums",
+                      "sticky right-0 z-20 px-4 py-3 text-right text-sm font-bold tabular-nums before:content-[''] before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[2px] before:bg-foreground/20 before:shadow-[-2px_0_4px_-2px_rgba(0,0,0,0.15)]",
                       viewMode === "variance"
                         ? displayGrandTotal > 0
                           ? "bg-red-600 text-white"

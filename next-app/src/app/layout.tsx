@@ -23,7 +23,7 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "発注管理ダッシュボード | ProLE",
+  title: "発注管理ダッシュボード | PROLE",
   description: "Notion連携の発注管理システム",
 }
 

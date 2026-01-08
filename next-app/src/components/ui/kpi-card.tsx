@@ -40,6 +40,19 @@ const trendBgColors = {
   neutral: "bg-muted/50",
 }
 
+// Inverted colors for cost metrics (increase = bad, decrease = good)
+const invertedTrendColors = {
+  up: "text-red-400",
+  down: "text-blue-400",
+  neutral: "text-muted-foreground",
+}
+
+const invertedTrendBgColors = {
+  up: "bg-red-400/10",
+  down: "bg-blue-400/10",
+  neutral: "bg-muted/50",
+}
+
 interface KPICardProps
   extends React.ComponentProps<typeof Card>,
     VariantProps<typeof kpiCardVariants> {
@@ -53,6 +66,8 @@ interface KPICardProps
   loading?: boolean
   icon?: React.ReactNode
   sparkline?: number[]
+  /** Invert trend colors (up=red, down=blue). Use for cost metrics where increase is negative. */
+  invertTrend?: boolean
 }
 
 function KPICardSkeleton({ className }: { className?: string }) {
@@ -85,6 +100,7 @@ function KPICard({
   loading = false,
   icon,
   sparkline,
+  invertTrend = false,
   ...props
 }: KPICardProps) {
   if (loading) {
@@ -95,6 +111,10 @@ function KPICard({
   const trend = propTrend ?? (change !== undefined ? (change > 0 ? "up" : change < 0 ? "down" : "neutral") : "neutral")
 
   const TrendIcon = trend === "up" ? TrendingUp : trend === "down" ? TrendingDown : Minus
+
+  // Select color scheme based on invertTrend
+  const colorScheme = invertTrend ? invertedTrendColors : trendColors
+  const bgColorScheme = invertTrend ? invertedTrendBgColors : trendBgColors
 
   const formattedValue = typeof value === "number"
     ? value.toLocaleString("ja-JP")
@@ -147,8 +167,8 @@ function KPICard({
               <div
                 className={cn(
                   "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
-                  trendBgColors[trend],
-                  trendColors[trend]
+                  bgColorScheme[trend],
+                  colorScheme[trend]
                 )}
               >
                 <TrendIcon className="size-3" />

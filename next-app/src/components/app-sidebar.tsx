@@ -100,7 +100,7 @@ export function AppSidebar({ collapsed = false, onCollapsedChange }: AppSidebarP
             P
           </div>
           {!collapsed && (
-            <span className="text-lg font-semibold">ProLE</span>
+            <span className="text-lg font-semibold">PROLE</span>
           )}
         </Link>
       </div>

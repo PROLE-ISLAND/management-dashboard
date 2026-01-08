@@ -1,4 +1,4 @@
-"""経営ダッシュボード - Notion発注データ表示（集計機能付き）"""
+"""経営ダッシュボード - モダンUI版"""
 
 import reflex as rx
 import httpx
@@ -12,17 +12,12 @@ SUPABASE_URL = "https://rvhoveymacotfyyignba.supabase.co"
 SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ2aG92ZXltYWNvdGZ5eWlnbmJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3NjE0NjYsImV4cCI6MjA4MzMzNzQ2Nn0.-diBq2LtI_zHhHra4754-p12vlGvr9_8qvmehySiPm4"
 
 
-def format_yen(amount: float) -> str:
-    """金額を整数・カンマ付きで表示（遵守事項）"""
-    return f"¥{int(amount):,}"
-
-
 class OrderItem(BaseModel):
     """発注アイテム"""
     notion_id: str = ""
     name: str = ""
     scope: str = ""
-    amount: int = 0  # 整数で保持
+    amount: int = 0
     date: str = ""
     status: str = ""
     platform: str = ""
@@ -30,9 +25,9 @@ class OrderItem(BaseModel):
 
 class AggregateItem(BaseModel):
     """集計アイテム"""
-    period: str = ""  # 期間ラベル
+    period: str = ""
     count: int = 0
-    total: int = 0  # 整数で保持
+    total: int = 0
 
 
 class State(rx.State):
@@ -46,21 +41,31 @@ class State(rx.State):
     loading: bool = True
     error: str = ""
     total_count: int = 0
-    total_amount: int = 0  # 整数
-    avg_amount: int = 0  # 整数
+    total_amount: int = 0
+    avg_amount: int = 0
 
-    agg_mode: str = "monthly"  # daily, weekly, monthly
+    agg_mode: str = "monthly"
     search_query: str = ""
+
+    @rx.var
+    def total_amount_formatted(self) -> str:
+        """総支給額（カンマ付き）"""
+        return f"¥{self.total_amount:,}"
+
+    @rx.var
+    def avg_amount_formatted(self) -> str:
+        """平均単価（カンマ付き）"""
+        return f"¥{self.avg_amount:,}"
 
     @rx.var
     def current_agg(self) -> List[AggregateItem]:
         """現在選択中の集計データ"""
         if self.agg_mode == "daily":
-            return self.daily_agg[:30]  # 直近30日
+            return self.daily_agg[:30]
         elif self.agg_mode == "weekly":
-            return self.weekly_agg[:12]  # 直近12週
+            return self.weekly_agg[:12]
         else:
-            return self.monthly_agg[:12]  # 直近12ヶ月
+            return self.monthly_agg[:12]
 
     @rx.var
     def filtered_orders(self) -> List[OrderItem]:
@@ -82,6 +87,7 @@ class State(rx.State):
         """Supabaseからnotion_ordersを取得"""
         self.loading = True
         self.error = ""
+        print("[DEBUG] fetch_orders started, loading=True")
 
         try:
             async with httpx.AsyncClient(timeout=30) as client:
@@ -97,17 +103,22 @@ class State(rx.State):
                         "limit": "1000"
                     }
                 )
+                print(f"[DEBUG] API response: {response.status_code}")
 
                 if response.status_code == 200:
                     data = response.json()
+                    print(f"[DEBUG] Got {len(data)} records")
                     self._process_data(data)
+                    print(f"[DEBUG] After process: orders={len(self.orders)}, monthly_agg={len(self.monthly_agg)}")
                 else:
                     self.error = f"API Error: {response.status_code}"
 
         except Exception as e:
             self.error = f"Error: {str(e)}"
+            print(f"[DEBUG] Exception: {e}")
         finally:
             self.loading = False
+            print(f"[DEBUG] fetch_orders done, loading=False")
 
     def _process_data(self, data: list):
         """データを処理して集計"""
@@ -130,7 +141,6 @@ class State(rx.State):
 
             date_str = str(props.get("申請日", "-") or "-")
 
-            # 集計用の日付解析
             if date_str and date_str != "-":
                 try:
                     dt = datetime.strptime(date_str, "%Y-%m-%d")
@@ -163,7 +173,6 @@ class State(rx.State):
         self.total_amount = total
         self.avg_amount = total // len(items) if items else 0
 
-        # 集計データをソート
         self.daily_agg = [
             AggregateItem(period=k, count=v["count"], total=v["total"])
             for k, v in sorted(daily.items(), reverse=True)
@@ -185,129 +194,268 @@ class State(rx.State):
         self.search_query = value
 
 
-def stat_card(title: str, value: rx.Var, icon: str, color: str) -> rx.Component:
-    """統計カード"""
+# ========== モダンUIコンポーネント ==========
+
+def glass_card(*children, **props) -> rx.Component:
+    """グラスモーフィズムカード"""
     return rx.box(
-        rx.hstack(
-            rx.center(
-                rx.icon(icon, size=22, color=f"var(--{color}-11)"),
-                width="44px",
-                height="44px",
-                border_radius="lg",
-                background=f"var(--{color}-3)",
-            ),
-            rx.vstack(
-                rx.text(title, size="1", color="gray", weight="medium"),
-                rx.text(value, size="5", weight="bold"),
-                spacing="0",
-                align="start",
-            ),
-            spacing="3",
-        ),
-        padding="4",
-        border_radius="lg",
-        background="white",
-        border="1px solid var(--gray-4)",
-        flex="1",
-        min_width="200px",
+        *children,
+        background="rgba(255, 255, 255, 0.8)",
+        backdrop_filter="blur(20px)",
+        border="1px solid rgba(255, 255, 255, 0.3)",
+        border_radius="20px",
+        box_shadow="0 8px 32px rgba(0, 0, 0, 0.08)",
+        **props,
     )
 
 
+def stat_card(title: str, value: rx.Var, subtitle: str, gradient: str, icon: str) -> rx.Component:
+    """統計カード - グラデーション背景"""
+    return rx.box(
+        rx.vstack(
+            rx.hstack(
+                rx.box(
+                    rx.icon(icon, size=24, color="white"),
+                    padding="12px",
+                    background="rgba(255, 255, 255, 0.2)",
+                    border_radius="12px",
+                ),
+                rx.spacer(),
+                rx.badge(
+                    subtitle,
+                    color_scheme="gray",
+                    variant="surface",
+                    size="1",
+                ),
+                width="100%",
+            ),
+            rx.text(
+                value,
+                font_size="32px",
+                font_weight="700",
+                color="white",
+                letter_spacing="-0.02em",
+            ),
+            rx.text(
+                title,
+                font_size="14px",
+                color="rgba(255, 255, 255, 0.8)",
+                font_weight="500",
+            ),
+            spacing="3",
+            align="start",
+            width="100%",
+        ),
+        background=gradient,
+        padding="24px",
+        border_radius="20px",
+        box_shadow="0 10px 40px rgba(0, 0, 0, 0.15)",
+        min_width="280px",
+        flex="1",
+        transition="transform 0.2s ease, box-shadow 0.2s ease",
+        _hover={
+            "transform": "translateY(-4px)",
+            "box_shadow": "0 20px 60px rgba(0, 0, 0, 0.2)",
+        },
+    )
+
+
+def format_amount(amount: int) -> str:
+    """金額フォーマット（カンマ付き）"""
+    return f"¥{amount:,}"
+
+
 def agg_bar(item: AggregateItem) -> rx.Component:
-    """集計バー"""
+    """集計バー - モダン版"""
     pct = (item.total / State.max_agg_total * 100)
 
     return rx.hstack(
-        rx.text(item.period, size="2", min_width="90px", weight="medium"),
+        rx.text(
+            item.period,
+            font_size="13px",
+            font_weight="600",
+            color="#374151",
+            min_width="80px",
+        ),
         rx.box(
             rx.box(
+                rx.box(
+                    height="100%",
+                    width=pct.to_string() + "%",
+                    background="linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%)",
+                    border_radius="8px",
+                    transition="width 0.5s ease",
+                ),
+                width="100%",
                 height="100%",
-                width=pct.to_string() + "%",
-                background="linear-gradient(90deg, var(--blue-9), var(--blue-7))",
-                border_radius="md",
+                position="relative",
             ),
             flex="1",
-            height="28px",
-            background="var(--gray-3)",
-            border_radius="md",
+            height="32px",
+            background="linear-gradient(90deg, #f3f4f6 0%, #e5e7eb 100%)",
+            border_radius="8px",
             overflow="hidden",
         ),
-        rx.text(
-            "¥" + item.total.to(int).to_string(),
-            size="2",
-            weight="medium",
+        rx.vstack(
+            rx.text(
+                "¥" + item.total.to(int).to_string(),
+                font_size="14px",
+                font_weight="700",
+                color="#1f2937",
+            ),
+            rx.text(
+                item.count.to_string() + "件",
+                font_size="11px",
+                color="#6b7280",
+            ),
+            spacing="0",
+            align="end",
             min_width="100px",
-            text_align="right",
         ),
-        rx.text(
-            item.count.to_string() + "件",
-            size="1",
-            color="gray",
-            min_width="50px",
-            text_align="right",
-        ),
-        spacing="3",
+        spacing="4",
         width="100%",
-        padding_y="1",
+        padding="8px 12px",
+        background="white",
+        border_radius="12px",
+        box_shadow="0 1px 3px rgba(0, 0, 0, 0.05)",
+        transition="all 0.2s ease",
+        _hover={
+            "background": "#fafafa",
+            "box_shadow": "0 4px 12px rgba(0, 0, 0, 0.08)",
+        },
     )
 
 
 def order_row(order: OrderItem) -> rx.Component:
-    """発注行"""
+    """発注行 - モダン版"""
     return rx.table.row(
         rx.table.cell(
-            rx.text(
-                rx.cond(order.name.length() > 40, order.name[:40] + "...", order.name),
-                size="2",
+            rx.hstack(
+                rx.box(
+                    width="8px",
+                    height="8px",
+                    border_radius="full",
+                    background=rx.cond(
+                        order.status == "発注済",
+                        "#10b981",
+                        "#9ca3af",
+                    ),
+                ),
+                rx.text(
+                    rx.cond(order.name.length() > 35, order.name[:35] + "...", order.name),
+                    font_size="13px",
+                    font_weight="500",
+                    color="#1f2937",
+                ),
+                spacing="2",
             )
         ),
-        rx.table.cell(rx.badge(order.scope, size="1", variant="soft")),
+        rx.table.cell(
+            rx.badge(
+                order.scope,
+                color_scheme="violet",
+                variant="soft",
+                radius="full",
+                size="1",
+            )
+        ),
         rx.table.cell(
             rx.cond(
                 order.amount > 0,
-                rx.text("¥" + order.amount.to_string(), size="2", weight="medium"),
-                rx.text("-", size="2", color="gray"),
+                rx.text(
+                    "¥" + order.amount.to_string(),
+                    font_size="13px",
+                    font_weight="600",
+                    color="#059669",
+                ),
+                rx.text("-", font_size="13px", color="#9ca3af"),
             ),
             text_align="right",
         ),
-        rx.table.cell(rx.text(order.date, size="2", color="gray")),
+        rx.table.cell(
+            rx.text(order.date, font_size="12px", color="#6b7280")
+        ),
         rx.table.cell(
             rx.badge(
                 order.status,
+                color_scheme=rx.cond(order.status == "発注済", "green", "gray"),
+                variant="soft",
+                radius="full",
                 size="1",
-                color=rx.cond(order.status == "発注済", "green", "gray"),
             )
         ),
-        _hover={"background": "var(--gray-2)"},
+        _hover={"background": "#f9fafb"},
     )
 
 
 def index() -> rx.Component:
-    """メインページ"""
+    """メインページ - モダンUI"""
     return rx.box(
         # ヘッダー
-        rx.hstack(
+        rx.box(
             rx.hstack(
-                rx.icon("layout-dashboard", size=26, color="var(--blue-11)"),
-                rx.heading("経営ダッシュボード", size="6", weight="bold"),
-                spacing="2",
-            ),
-            rx.spacer(),
-            rx.hstack(
-                rx.color_mode.button(variant="ghost", size="2"),
-                rx.button(
-                    rx.icon("refresh-cw", size=14),
-                    "更新",
-                    size="2",
-                    variant="soft",
-                    on_click=State.fetch_orders,
-                    loading=State.loading,
+                rx.hstack(
+                    rx.box(
+                        rx.icon("bar-chart-3", size=24, color="white"),
+                        padding="10px",
+                        background="linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+                        border_radius="12px",
+                    ),
+                    rx.vstack(
+                        rx.text(
+                            "経営ダッシュボード",
+                            font_size="20px",
+                            font_weight="700",
+                            color="#1f2937",
+                        ),
+                        rx.text(
+                            "Notion発注データ管理",
+                            font_size="12px",
+                            color="#6b7280",
+                        ),
+                        spacing="0",
+                        align="start",
+                    ),
+                    spacing="3",
                 ),
-                spacing="2",
+                rx.spacer(),
+                rx.hstack(
+                    rx.badge(
+                        rx.hstack(
+                            rx.box(
+                                width="8px",
+                                height="8px",
+                                border_radius="full",
+                                background="#10b981",
+                            ),
+                            rx.text("同期済み", font_size="12px"),
+                            spacing="2",
+                        ),
+                        color_scheme="green",
+                        variant="soft",
+                        size="2",
+                    ),
+                    rx.button(
+                        rx.icon("refresh-cw", size=16),
+                        "更新",
+                        size="2",
+                        variant="soft",
+                        color_scheme="violet",
+                        on_click=State.fetch_orders,
+                        loading=State.loading,
+                        cursor="pointer",
+                    ),
+                    spacing="3",
+                ),
+                padding="20px 32px",
+                width="100%",
             ),
-            padding="4",
-            border_bottom="1px solid var(--gray-4)",
-            background="white",
+            background="rgba(255, 255, 255, 0.9)",
+            backdrop_filter="blur(20px)",
+            border_bottom="1px solid rgba(0, 0, 0, 0.05)",
+            position="sticky",
+            top="0",
+            z_index="100",
         ),
 
         # メインコンテンツ
@@ -317,31 +465,43 @@ def index() -> rx.Component:
                 stat_card(
                     "総発注件数",
                     State.total_count.to_string() + "件",
+                    "Total Orders",
+                    "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
                     "file-text",
-                    "blue",
                 ),
                 stat_card(
                     "総支給額",
-                    "¥" + State.total_amount.to_string(),
+                    State.total_amount_formatted,
+                    "Total Amount",
+                    "linear-gradient(135deg, #10b981 0%, #059669 100%)",
                     "banknote",
-                    "green",
                 ),
                 stat_card(
                     "平均単価",
-                    "¥" + State.avg_amount.to_string(),
-                    "calculator",
-                    "purple",
+                    State.avg_amount_formatted,
+                    "Average",
+                    "linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)",
+                    "trending-up",
                 ),
-                gap="4",
+                gap="24px",
                 wrap="wrap",
-                padding="4",
+                padding="32px",
             ),
 
             # 集計セクション
-            rx.box(
+            glass_card(
                 rx.vstack(
                     rx.hstack(
-                        rx.heading("コスト集計", size="4", weight="bold"),
+                        rx.hstack(
+                            rx.icon("pie-chart", size=20, color="#6366f1"),
+                            rx.text(
+                                "コスト集計",
+                                font_size="18px",
+                                font_weight="700",
+                                color="#1f2937",
+                            ),
+                            spacing="2",
+                        ),
                         rx.spacer(),
                         rx.segmented_control.root(
                             rx.segmented_control.item("日次", value="daily"),
@@ -349,103 +509,141 @@ def index() -> rx.Component:
                             rx.segmented_control.item("月次", value="monthly"),
                             value=State.agg_mode,
                             on_change=State.set_agg_mode,
-                            size="1",
+                            size="2",
+                            radius="full",
                         ),
                         width="100%",
+                        align="center",
                     ),
-                    rx.divider(),
+                    rx.divider(margin_y="16px"),
                     rx.cond(
                         State.loading,
-                        rx.center(rx.spinner(size="2"), padding="6"),
+                        rx.center(
+                            rx.vstack(
+                                rx.spinner(size="3"),
+                                rx.text("読み込み中...", font_size="14px", color="#6b7280"),
+                                spacing="3",
+                            ),
+                            padding="48px",
+                        ),
                         rx.cond(
                             State.current_agg.length() > 0,
                             rx.vstack(
                                 rx.foreach(State.current_agg, agg_bar),
-                                spacing="1",
+                                spacing="2",
                                 width="100%",
                             ),
                             rx.center(
-                                rx.text("データがありません", color="gray"),
-                                padding="6",
+                                rx.vstack(
+                                    rx.icon("inbox", size=48, color="#d1d5db"),
+                                    rx.text("データがありません", font_size="14px", color="#9ca3af"),
+                                    spacing="2",
+                                ),
+                                padding="48px",
                             ),
                         ),
                     ),
-                    spacing="3",
+                    spacing="4",
                     width="100%",
                 ),
-                padding="4",
-                margin="4",
-                background="white",
-                border_radius="lg",
-                border="1px solid var(--gray-4)",
+                padding="28px",
+                margin="0 32px 24px 32px",
             ),
 
-            # 検索 & テーブル
-            rx.box(
+            # 発注一覧
+            glass_card(
                 rx.vstack(
                     rx.hstack(
-                        rx.heading("発注一覧", size="4", weight="bold"),
-                        rx.spacer(),
-                        rx.input(
-                            placeholder="検索...",
-                            value=State.search_query,
-                            on_change=State.set_search,
-                            width="200px",
-                            size="2",
+                        rx.hstack(
+                            rx.icon("list", size=20, color="#6366f1"),
+                            rx.text(
+                                "発注一覧",
+                                font_size="18px",
+                                font_weight="700",
+                                color="#1f2937",
+                            ),
+                            spacing="2",
                         ),
-                        rx.text(
-                            State.filtered_orders.length().to_string() + "件",
-                            size="2",
-                            color="gray",
+                        rx.spacer(),
+                        rx.hstack(
+                            rx.input(
+                                placeholder="検索...",
+                                value=State.search_query,
+                                on_change=State.set_search,
+                                width="200px",
+                                size="2",
+                                radius="full",
+                            ),
+                            rx.badge(
+                                State.filtered_orders.length().to_string() + "件表示",
+                                color_scheme="gray",
+                                variant="soft",
+                                size="2",
+                            ),
+                            spacing="3",
                         ),
                         width="100%",
                         align="center",
                     ),
                     rx.cond(
                         State.error != "",
-                        rx.callout(State.error, icon="triangle_alert", color="red"),
+                        rx.callout(
+                            State.error,
+                            icon="triangle-alert",
+                            color="red",
+                            size="2",
+                        ),
                     ),
                     rx.cond(
                         State.loading,
                         rx.center(
                             rx.vstack(
-                                rx.spinner(size="2"),
-                                rx.text("読み込み中...", size="2", color="gray"),
+                                rx.spinner(size="3"),
+                                rx.text("読み込み中...", font_size="14px", color="#6b7280"),
+                                spacing="3",
                             ),
-                            padding="8",
+                            padding="48px",
                         ),
                         rx.box(
                             rx.table.root(
                                 rx.table.header(
                                     rx.table.row(
-                                        rx.table.column_header_cell("発注決裁名"),
-                                        rx.table.column_header_cell("職務範囲"),
-                                        rx.table.column_header_cell("総支給額", text_align="right"),
-                                        rx.table.column_header_cell("申請日"),
-                                        rx.table.column_header_cell("ステータス"),
+                                        rx.table.column_header_cell(
+                                            rx.text("発注決裁名", font_weight="600", color="#374151")
+                                        ),
+                                        rx.table.column_header_cell(
+                                            rx.text("職務範囲", font_weight="600", color="#374151")
+                                        ),
+                                        rx.table.column_header_cell(
+                                            rx.text("総支給額", font_weight="600", color="#374151"),
+                                            text_align="right",
+                                        ),
+                                        rx.table.column_header_cell(
+                                            rx.text("申請日", font_weight="600", color="#374151")
+                                        ),
+                                        rx.table.column_header_cell(
+                                            rx.text("ステータス", font_weight="600", color="#374151")
+                                        ),
                                     ),
                                 ),
                                 rx.table.body(
                                     rx.foreach(State.filtered_orders, order_row),
                                 ),
                                 width="100%",
-                                size="1",
+                                size="2",
                             ),
                             overflow_x="auto",
                         ),
                     ),
-                    spacing="3",
+                    spacing="4",
                     width="100%",
                 ),
-                padding="4",
-                margin="4",
-                background="white",
-                border_radius="lg",
-                border="1px solid var(--gray-4)",
+                padding="28px",
+                margin="0 32px 32px 32px",
             ),
 
-            background="var(--gray-2)",
-            min_height="calc(100vh - 60px)",
+            background="linear-gradient(180deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%)",
+            min_height="calc(100vh - 80px)",
         ),
 
         on_mount=State.fetch_orders,
@@ -453,6 +651,13 @@ def index() -> rx.Component:
 
 
 app = rx.App(
-    theme=rx.theme(appearance="light", accent_color="blue", radius="medium"),
+    theme=rx.theme(
+        appearance="light",
+        accent_color="violet",
+        radius="large",
+    ),
+    stylesheets=[
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+    ],
 )
 app.add_page(index, title="経営ダッシュボード")

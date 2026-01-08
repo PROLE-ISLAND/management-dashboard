@@ -107,6 +107,18 @@ export default function Dashboard() {
     return ordersWithDueDate.filter(order => isInRange(order.dueDate, monthStart, monthEnd))
   }, [ordersWithDueDate, monthStart, monthEnd])
 
+  // Get previous month range
+  const { start: prevMonthStart, end: prevMonthEnd } = useMemo(() => {
+    const prevDate = new Date(selectedDate)
+    prevDate.setMonth(prevDate.getMonth() - 1)
+    return getMonthRange(prevDate)
+  }, [selectedDate])
+
+  // Filter orders for previous month (for comparison)
+  const prevMonthOrders = useMemo(() => {
+    return ordersWithDueDate.filter(order => isInRange(order.dueDate, prevMonthStart, prevMonthEnd))
+  }, [ordersWithDueDate, prevMonthStart, prevMonthEnd])
+
   // Transform all orders to accounting table data
   const orderData: OrderData[] = useMemo(() => {
     return ordersWithDueDate.map(order => ({
@@ -129,6 +141,28 @@ export default function Dashboard() {
           monthlyOrders.reduce((sum, o) => sum + o.hourlyRate, 0) / monthlyOrders.length
         )
       : 0
+
+  // Calculate KPIs for previous month
+  const prevTotalOrders = prevMonthOrders.length
+  const prevTotalPayment = prevMonthOrders.reduce((sum, o) => sum + o.totalPayment, 0)
+  const prevTotalHours = prevMonthOrders.reduce((sum, o) => sum + o.hours, 0)
+  const prevAvgHourlyRate =
+    prevMonthOrders.length > 0
+      ? Math.round(
+          prevMonthOrders.reduce((sum, o) => sum + o.hourlyRate, 0) / prevMonthOrders.length
+        )
+      : 0
+
+  // Calculate percentage changes (handle division by zero)
+  const calcChange = (current: number, previous: number): number | undefined => {
+    if (previous === 0) return current > 0 ? 100 : undefined
+    return ((current - previous) / previous) * 100
+  }
+
+  const ordersChange = calcChange(totalOrders, prevTotalOrders)
+  const paymentChange = calcChange(totalPayment, prevTotalPayment)
+  const hoursChange = calcChange(totalHours, prevTotalHours)
+  const hourlyRateChange = calcChange(avgHourlyRate, prevAvgHourlyRate)
 
   // Navigation
   const goToPrevMonth = () => {
@@ -324,24 +358,33 @@ export default function Dashboard() {
               title="発注数"
               value={totalOrders}
               suffix="件"
+              change={ordersChange}
+              changeLabel="前月比"
               icon={<Users className="size-4" />}
             />
             <KPICard
               title="支給額"
               value={totalPayment}
               prefix="¥"
+              change={paymentChange}
+              changeLabel="前月比"
               icon={<Banknote className="size-4" />}
+              invertTrend
             />
             <KPICard
               title="稼働時間"
               value={totalHours}
               suffix="h"
+              change={hoursChange}
+              changeLabel="前月比"
               icon={<Clock className="size-4" />}
             />
             <KPICard
               title="平均時給"
               value={avgHourlyRate}
               prefix="¥"
+              change={hourlyRateChange}
+              changeLabel="前月比"
               icon={<TrendingUp className="size-4" />}
             />
           </div>
