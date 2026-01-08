@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS approval.requests (
     status VARCHAR(20) NOT NULL DEFAULT 'draft',
     submitted_at TIMESTAMPTZ,
     completed_at TIMESTAMPTZ,
+    linked_cost_order_id UUID,                                -- 予算連携用（将来: cost_ordersへのFK）
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
@@ -27,6 +28,7 @@ CREATE INDEX idx_approval_requests_requester ON approval.requests(requester_id);
 CREATE INDEX idx_approval_requests_status ON approval.requests(status);
 CREATE INDEX idx_approval_requests_route ON approval.requests(route_id);
 CREATE INDEX idx_approval_requests_submitted ON approval.requests(submitted_at) WHERE submitted_at IS NOT NULL;
+CREATE INDEX idx_approval_requests_cost_order ON approval.requests(linked_cost_order_id) WHERE linked_cost_order_id IS NOT NULL;
 
 -- RLS有効化
 ALTER TABLE approval.requests ENABLE ROW LEVEL SECURITY;
@@ -85,3 +87,4 @@ CREATE POLICY "requests_all_by_admin" ON approval.requests
 COMMENT ON TABLE approval.requests IS '稟議申請';
 COMMENT ON COLUMN approval.requests.status IS 'ステータス: draft=下書き, pending=承認中, approved=承認済, rejected=却下, cancelled=取消';
 COMMENT ON COLUMN approval.requests.amount IS '申請金額（円）';
+COMMENT ON COLUMN approval.requests.linked_cost_order_id IS '予算連携用（将来的にcost_ordersテーブルへFK制約追加予定）';

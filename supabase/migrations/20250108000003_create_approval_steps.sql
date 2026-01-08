@@ -3,11 +3,13 @@
 -- Issue: #6 feat(db): IPO稟議ワークフロー - DBスキーマ
 -- =====================================================
 
--- 承認ステップテーブル
+-- 承認ステップテーブル（並列承認対応）
 CREATE TABLE IF NOT EXISTS approval.steps (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     request_id UUID NOT NULL REFERENCES approval.requests(id) ON DELETE CASCADE,
-    step_order INTEGER NOT NULL,
+    step_group INTEGER NOT NULL DEFAULT 1,     -- 同一グループ=並列承認
+    step_order INTEGER NOT NULL DEFAULT 1,     -- グループ内表示順
+    required_count INTEGER NOT NULL DEFAULT 1, -- グループ内必要承認数（1=誰か1人, N=N人全員）
     approver_id UUID NOT NULL REFERENCES auth.users(id),
     approver_role VARCHAR(50) NOT NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'pending',
@@ -17,13 +19,15 @@ CREATE TABLE IF NOT EXISTS approval.steps (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     CONSTRAINT valid_step_status CHECK (status IN ('pending', 'approved', 'rejected', 'skipped')),
-    CONSTRAINT unique_request_step UNIQUE (request_id, step_order)
+    CONSTRAINT valid_required_count CHECK (required_count >= 1),
+    CONSTRAINT unique_request_group_approver UNIQUE (request_id, step_group, approver_id)
 );
 
 -- インデックス
 CREATE INDEX idx_approval_steps_request ON approval.steps(request_id);
 CREATE INDEX idx_approval_steps_approver ON approval.steps(approver_id);
 CREATE INDEX idx_approval_steps_status ON approval.steps(status);
+CREATE INDEX idx_approval_steps_group ON approval.steps(request_id, step_group);
 
 -- RLS有効化
 ALTER TABLE approval.steps ENABLE ROW LEVEL SECURITY;
@@ -73,7 +77,9 @@ CREATE POLICY "steps_all_by_admin" ON approval.steps
     );
 
 -- コメント
-COMMENT ON TABLE approval.steps IS '承認ステップ';
-COMMENT ON COLUMN approval.steps.step_order IS '承認順序（1から開始）';
+COMMENT ON TABLE approval.steps IS '承認ステップ（並列承認対応）';
+COMMENT ON COLUMN approval.steps.step_group IS '承認グループ（同一グループ=並列承認）';
+COMMENT ON COLUMN approval.steps.step_order IS 'グループ内表示順序';
+COMMENT ON COLUMN approval.steps.required_count IS 'グループ内必要承認数（1=誰か1人, N=N人全員）';
 COMMENT ON COLUMN approval.steps.approver_role IS '承認時点での役職';
 COMMENT ON COLUMN approval.steps.status IS 'ステータス: pending=待機, approved=承認, rejected=却下, skipped=スキップ';
