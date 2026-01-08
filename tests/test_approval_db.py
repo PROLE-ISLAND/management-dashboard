@@ -2,6 +2,14 @@
 IPO稟議ワークフロー DBスキーマ テスト
 Issue: #6 feat(db): IPO稟議ワークフロー - DBスキーマ
 
+スキーマ: approval（publicから分離）
+テーブル:
+  - approval.routes
+  - approval.requests
+  - approval.steps
+  - approval.logs
+  - approval.user_roles
+
 DoD Level: Silver
 - 統合テスト: RLSポリシー検証
 - 統合テスト: 監査ログ改ざん防止検証
