@@ -28,6 +28,8 @@ jobs:
   lint:
     name: "🔷 A2: Lint"
     runs-on: ubuntu-latest
+    # ci:skip または type:requirements ラベルがある場合はスキップ
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:skip') && !contains(github.event.pull_request.labels.*.name, 'type:requirements') }}
     steps:
       - uses: actions/checkout@v4
 
@@ -54,6 +56,7 @@ jobs:
   type-check:
     name: "🔷 A1: 型チェック"
     runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:skip') && !contains(github.event.pull_request.labels.*.name, 'type:requirements') }}
     steps:
       - uses: actions/checkout@v4
 
@@ -79,6 +82,7 @@ jobs:
   unit-test:
     name: "🧪 B1-B9: 単体テスト"
     runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:skip') && !contains(github.event.pull_request.labels.*.name, 'type:requirements') }}
     steps:
       - uses: actions/checkout@v4
 
@@ -156,7 +160,8 @@ jobs:
   build:
     name: "🏗️ K1: ビルド"
     runs-on: ubuntu-latest
-    needs: [lint]  # lintが通れば並行実行
+    needs: [lint]
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:skip') && !contains(github.event.pull_request.labels.*.name, 'type:requirements') }}
     steps:
       - uses: actions/checkout@v4
 
@@ -193,7 +198,7 @@ jobs:
     name: 🥉 Bronze Gate
     runs-on: ubuntu-latest
     needs: [lint, type-check, unit-test, build]
-    if: always()
+    if: ${{ always() && !contains(github.event.pull_request.labels.*.name, 'ci:skip') && !contains(github.event.pull_request.labels.*.name, 'type:requirements') }}
     steps:
       - name: 📝 Bronze Gate Summary
         run: |
