@@ -56,6 +56,9 @@ Depends: #6 (DBスキーマ)
 | BR-03 | 監査ログは追記のみ（UPDATE/DELETE不可） | J-SOX |
 | BR-04 | 金額に応じて承認ルートを自動選択 | 内部統制 |
 | BR-05 | 並列承認グループは required_count 分の承認で次へ | ワークフロー |
+| BR-06 | 代理承認は委任期間内かつ金額上限以下の場合のみ有効 | 内部統制 |
+| BR-07 | 却下された稟議は再申請可能（新規稟議として作成） | ワークフロー |
+| BR-08 | 差戻し後は下書き状態に戻り、金額変更時はルート再選択 | 内部統制 |
 
 ---
 
@@ -290,6 +293,9 @@ async function checkGroupApproval(
 | `service.test.ts` | createApproval | 正常作成、バリデーションエラー |
 | `service.test.ts` | submitApproval | 下書きから申請、承認中は申請不可 |
 | `service.test.ts` | approveStep | 正常承認、職務分離違反、二重承認防止 |
+| `service.test.ts` | approveByDelegate | 代理承認（期間内/外、金額上限内/超過） |
+| `service.test.ts` | returnStep | 差戻し→下書き状態、金額変更→ルート再選択 |
+| `service.test.ts` | rejectStep | 却下→rejected状態、再申請は新規作成 |
 | `route-selector.test.ts` | selectRoute | 10万円→課長、50万円→部長、100万円→役員、1000万円→取締役会 |
 | `route-selector.test.ts` | selectRoute | 境界値: 100000, 100001, 500000, 500001 |
 | `route-selector.test.ts` | selectRoute | カテゴリ別ルート選択（contract） |
@@ -302,9 +308,10 @@ async function checkGroupApproval(
 |----|---------|-------------|
 | INT-01 | 稟議CRUD一連フロー | 作成→更新→申請→承認→完了 |
 | INT-02 | 並列承認フロー | 2人中1人承認→残りスキップ→次グループ |
-| INT-03 | 却下・差戻しフロー | 却下→ステータス更新、差戻し→下書きに戻る |
+| INT-03 | 却下・差戻しフロー | 却下→ステータス更新、差戻し→下書きに戻る→金額変更→ルート再選択 |
 | INT-04 | 監査ログ完全性 | 全操作がログに記録される |
-| INT-05 | 認証・認可 | 未認証拒否、他人の稟議アクセス拒否 |
+| INT-05 | 認証・認可 | 未認証拒否、他人の稟議アクセス拒否、職務分離 |
+| INT-06 | 代理承認フロー | 委任期間内→承認可、期間外→拒否、金額超過→拒否 |
 
 ### 5.4 テストファイル一覧
 
@@ -336,11 +343,14 @@ async function checkGroupApproval(
 | BR-03 | logger.test.ts#追記のみ | INT-04 | - | ログ不変性 |
 | BR-04 | route-selector.test.ts#境界値 | INT-01 | - | 金額別ルート |
 | BR-05 | service.test.ts#並列承認 | INT-02 | - | required_count判定 |
+| BR-06 | service.test.ts#代理承認検証 | INT-06 | - | 委任期間・金額上限 |
+| BR-07 | service.test.ts#却下後再申請 | INT-03 | - | 新規稟議として作成 |
+| BR-08 | service.test.ts#差戻し後編集 | INT-03 | - | ルート再選択 |
 
 **カバレッジ分析:**
-- Unit Test: 16/16 (100%)
-- Integration Test: 16/16 (100%)
-- E2E Test: 7/16 (44%) ※UI実装時に追加予定
+- Unit Test: 19/19 (100%)
+- Integration Test: 19/19 (100%)
+- E2E Test: 7/19 (37%) ※UI実装時に追加予定
 
 ---
 
