@@ -31,5 +31,75 @@
         "@anthropic/mcp-filesystem"
       ]
     }
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/session_manager.py",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/branch_guard.py",
+            "timeout": 3000
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/gate.py",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/quality-ts.py",
+            "timeout": 120000
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/review.py",
+            "timeout": 30000
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/session_cleanup.py",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/dod-check.py",
+            "timeout": 10000
+          }
+        ]
+      }
+    ]
   }
 }
