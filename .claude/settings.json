@@ -1,37 +1,4 @@
 {
-  "permissions": {
-    "allow": [
-      "Bash(git:*)",
-      "Bash(gh:*)",
-      "Bash(prole:*)",
-      "Bash(pip:*)",
-      "Bash(pip3:*)",
-      "Bash(python:*)",
-      "Bash(python3:*)",
-      "Bash(reflex:*)",
-      "Bash(pytest:*)",
-      "Bash(ruff:*)",
-      "Bash(mypy:*)",
-      "Bash(source:*)",
-      "Read",
-      "Write",
-      "Edit",
-      "Glob",
-      "Grep"
-    ]
-  },
-  "env": {
-    "V0_API_KEY": "${V0_API_KEY}"
-  },
-  "mcpServers": {
-    "filesystem": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@anthropic/mcp-filesystem"
-      ]
-    }
-  },
   "hooks": {
     "UserPromptSubmit": [
       {
