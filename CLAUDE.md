@@ -1,872 +1,131 @@
-# プロジェクト固有の開発ルール
-
-## 🚨 遵守事項（必須）
-
-### 金額表示ルール
-1. **整数のみ**: 金額は必ず整数で表示（小数点以下は切り捨て）
-2. **カンマ必須**: 3桁ごとにカンマを入れる（例: ¥1,234,567）
-3. **円マーク**: 日本円は必ず「¥」を先頭につける
-
-```python
-# 正しい例
-f"¥{int(amount):,}"  # → ¥1,234,567 ✅
-
-# 間違い例
-f"¥{amount}"         # → ¥1234567.89 ❌
-f"{amount:,.2f}円"   # → 1,234,567.89円 ❌
-str(amount)          # → 1234567 ❌（カンマなし）
-```
-
-### 集計機能ルール
-1. **日次集計**: 日別のコスト・件数を表示
-2. **週次集計**: 週別（月曜始まり）のコスト・件数を表示
-3. **月次集計**: 月別のコスト・件数を表示
-4. **デフォルト**: 月次集計をデフォルト表示
-
-### データ表示ルール
-1. 空値・None・空文字は「-」で表示
-2. 日付は「YYYY-MM-DD」形式
-3. ステータスはバッジで色分け表示
-
----
-
-## プロジェクト概要
-**経営指標モニタリング＆予算管理ダッシュボード**
-- Retoolの代替として、コードファーストで開発可能なダッシュボードを構築
-- スプレッドシートライクな入力体験を提供
-- Claude Code (Vibe Coding) との高い親和性
-
-## 技術スタック
-- **Reflex** 0.8+ (Python Web Framework)
-- **Python** 3.11+
-- **AG Grid** (reflex-ag-grid) - スプレッドシート式編集
-- **SQLAlchemy** - DB接続（PostgreSQL/SQLite）
-
-## 開発環境セットアップ
-```bash
-cd ~/projects/management-dashboard
-source .venv/bin/activate
-pip install -r requirements.txt
-reflex run
-```
-
-## コマンド一覧
-| コマンド | 説明 |
-|---------|------|
-| `reflex run` | 開発サーバー起動 |
-| `reflex export` | 本番ビルド |
-| `ruff check .` | Lint実行 |
-| `ruff format .` | フォーマット |
-| `mypy management_dashboard/` | 型チェック |
-| `pytest tests/` | テスト実行 |
-
-## ディレクトリ構成
-```
-management-dashboard/
-├── management_dashboard/    # アプリ本体
-│   ├── __init__.py
-│   ├── management_dashboard.py  # メインエントリ
-│   ├── components/          # UIコンポーネント
-│   ├── pages/              # ページ
-│   └── state/              # 状態管理
-├── tests/                  # テスト
-├── .github/workflows/      # CI/CD
-├── requirements.txt        # 依存関係
-├── pyproject.toml          # ruff/mypy設定
-└── rxconfig.py             # Reflex設定
-```
-
----
-
-# 組織共通ルール（PROLE-ISLAND/.github より）
-
-# PROLE-ISLAND 開発ルール
+# {リポジトリ名} 開発ルール
 
 ## 📚 必読ドキュメント
+
+開発開始前に以下を確認すること：
 
 | ドキュメント | 内容 | 必須度 |
 |-------------|------|--------|
 | [DoD_STANDARDS.md](https://github.com/PROLE-ISLAND/.github/blob/main/DoD_STANDARDS.md) | 品質基準（77観点） | ⚠️ 最優先 |
-| [組織Wiki](https://github.com/PROLE-ISLAND/.github/wiki) | 開発プロセス（Phase 0-8） | ⚠️ 必須 |
+| [組織Wiki](https://github.com/PROLE-ISLAND/.github/wiki) | 開発標準・CI/CD・テスト戦略 | ⚠️ 必須 |
+| [組織CLAUDE.md](https://github.com/PROLE-ISLAND/.github/blob/main/CLAUDE.md) | 組織共通開発ルール | ⚠️ 必須 |
+| このファイル | プロジェクト固有ルール | 📖 参照 |
 
-> **ルール優先順位**: DoD_STANDARDS.md > 組織Wiki > リポジトリ固有CLAUDE.md
-
----
-
-## 🎯 開発プロセスガイド（Phase -1 〜 8）
-
-**開発は必ず以下のフェーズ順に進める。各フェーズで参照すべきドキュメントを確認すること。**
-
-### Phase -1: 調査（Investigation）⚠️新機能は必須
-
-**新機能開発前に既存システムを調査する。調査なしに要件定義を始めない。**
-
-| 参照ドキュメント | 確認項目 |
-|-----------------|---------|
-| [調査スキル活用ガイド](https://github.com/PROLE-ISLAND/.github/wiki/調査スキル活用ガイド) | 調査ファースト原則の理解 |
-| [/investigate スキル](https://github.com/PROLE-ISLAND/.github/blob/main/skill-templates/investigate.md) | Investigation Report v1 フォーマット |
-| [システム仕様書ガイド](https://github.com/PROLE-ISLAND/.github/wiki/システム仕様書ガイド) | 仕様書の参照・作成方法 |
-
-```
-【調査フロー】
-
-パターン1（推奨）: 調査 → Issue
-/investigate → Investigation Report v1 → Issue作成（レポートをリンク）
-
-パターン2（救済）: Issue → 調査
-Issue作成 → /investigate → 調査レポートをIssueコメントに投稿
-```
-
-### Phase 0: プロジェクト参加（新規メンバー）
-
-| 参照ドキュメント | 確認項目 |
-|-----------------|---------|
-| [オンボーディング](https://github.com/PROLE-ISLAND/.github/wiki/オンボーディング) | 環境構築完了 |
-| [組織リポジトリアーキテクチャ](https://github.com/PROLE-ISLAND/.github/wiki/組織リポジトリアーキテクチャ) | .github と各リポジトリの関係理解 |
-| [用語集](https://github.com/PROLE-ISLAND/.github/wiki/用語集) | プロジェクト用語の理解 |
-
-### Phase 1: 設計・技術選定
-
-| 参照ドキュメント | 確認項目 |
-|-----------------|---------|
-| [技術選定](https://github.com/PROLE-ISLAND/.github/wiki/技術選定) | ADR確認・新規技術はADR追加 |
-| [開発標準](https://github.com/PROLE-ISLAND/.github/wiki/開発標準) | 言語ルール・ディレクトリ構成 |
-
-### Phase 2: 要件定義・ユースケース ⚠️重要
-
-**新機能やE2Eテスト設計前に必ず実施。**
-
-| 参照ドキュメント | 確認項目 |
-|-----------------|---------|
-| [網羅性証明設計ガイド](https://github.com/PROLE-ISLAND/.github/wiki/網羅性証明設計ガイド) | 漏れ防止方法論の理解 |
-| [Universe抽出チェックリスト](https://github.com/PROLE-ISLAND/.github/wiki/Universe抽出チェックリスト) | ユースケース母集合の抽出 |
-| [ユースケース定義](https://github.com/PROLE-ISLAND/.github/wiki/ユースケース定義) | Role×Outcome形式で定義 |
-| [カバレッジマトリクス](https://github.com/PROLE-ISLAND/.github/wiki/カバレッジマトリクス) | MECE証明表（空白禁止） |
-
-### Phase 3: 品質基準理解
-
-| 参照ドキュメント | 確認項目 |
-|-----------------|---------|
-| [DoD_STANDARDS.md](https://github.com/PROLE-ISLAND/.github/blob/main/DoD_STANDARDS.md) | 77観点の品質基準 |
-| [テスト戦略](https://github.com/PROLE-ISLAND/.github/wiki/テスト戦略) | テスト方針・カバレッジ目標 |
-
-### Phase 4: 開発・実装
-
-| 参照ドキュメント | 確認項目 |
-|-----------------|---------|
-| [開発標準](https://github.com/PROLE-ISLAND/.github/wiki/開発標準) | コーディングルール遵守 |
-| [コミット規約](https://github.com/PROLE-ISLAND/.github/wiki/コミット規約) | コミットメッセージ・PR作成 |
-| 本ファイル「Issue駆動開発」セクション | Issue紐付け必須 |
-
-### Phase 5: テスト設計（Gold E2E）
-
-| 参照ドキュメント | 確認項目 |
-|-----------------|---------|
-| [Goldテストチャーター](https://github.com/PROLE-ISLAND/.github/wiki/Goldテストチャーター) | 目的・本数上限・採用基準 |
-| [Goldトリアージスコアリング](https://github.com/PROLE-ISLAND/.github/wiki/Goldトリアージスコアリング) | 4軸評価で優先度決定 |
-| [Gold仕様テンプレート](https://github.com/PROLE-ISLAND/.github/wiki/Gold仕様テンプレート) | GWT形式で仕様作成 |
-| [E2Eアンチパターン](https://github.com/PROLE-ISLAND/.github/wiki/E2Eアンチパターン) | 避けるべきパターン確認 |
-
-### Phase 6: テスト実装 ⚠️最重要
-
-**Gold E2Eテストは「仕様書を書いた」だけでは完了ではない。**
-
-| 参照ドキュメント | 確認項目 |
-|-----------------|---------|
-| [Playwright設計ルール](https://github.com/PROLE-ISLAND/.github/wiki/Playwright設計ルール) | 実装ルール遵守 |
-| [Gold実装完了チェックリスト](https://github.com/PROLE-ISLAND/.github/wiki/Gold実装完了チェックリスト) ★必読 | 環境準備→セレクター→ローカル→CI |
-
-```
-Gold E2E完了条件（B10-1〜B10-5）:
-□ B10-1: Secrets設定済み
-□ B10-2: テストデータ準備済み
-□ B10-3: セレクター存在確認済み
-□ B10-4: ローカル実行成功（3回連続pass）
-□ B10-5: CI実行成功
-```
-
-### Phase 7: CI/CD統合
-
-| 参照ドキュメント | 確認項目 |
-|-----------------|---------|
-| [CI-CDパイプライン](https://github.com/PROLE-ISLAND/.github/wiki/CI-CDパイプライン) | ワークフロー理解 |
-| [DoD-CIゲート連携](https://github.com/PROLE-ISLAND/.github/wiki/DoD-CIゲート連携) | DoDレベルとCI連携 |
-| [トレーサビリティ](https://github.com/PROLE-ISLAND/.github/wiki/トレーサビリティ) | UC→GS→PW→CI追跡 |
-
-### Phase 8: リリース・運用
-
-| 参照ドキュメント | 確認項目 |
-|-----------------|---------|
-| [リリースプロセス](https://github.com/PROLE-ISLAND/.github/wiki/リリースプロセス) | リリースフロー遵守 |
-| [トラブルシューティング](https://github.com/PROLE-ISLAND/.github/wiki/トラブルシューティング) | 問題発生時の対応 |
+> **ルール優先順位**: DoD_STANDARDS.md > 組織Wiki > 組織CLAUDE.md > このファイル
 
 ---
 
-## 🚨 新規作業開始ルール（Pre-mortem必須）
+## 🔧 技術スタック
 
-**初めて行う種類の作業は、コードを書く前に以下を実施する。**
+<!-- プロジェクトの技術スタックを記載 -->
 
-### Step 1: 完了定義の確認
+| カテゴリ | 技術 |
+|---------|------|
+| フレームワーク | Next.js 15+ |
+| 言語 | TypeScript |
+| スタイリング | Tailwind CSS v4 |
+| UI コンポーネント | shadcn/ui |
+| データベース | Supabase |
+| テスト | Vitest, Playwright |
 
-```
-□ この作業の「完了の定義」はWiki/DoDに存在するか？
-  → 検索: gh api "/repos/PROLE-ISLAND/.github/contents" で確認
-  → Wiki目次で該当Phaseを確認
+---
 
-□ 存在しない場合 → 先に完了定義を作成してから着手
-□ 存在する場合 → 読んでから着手、完了時に照合
-```
+## 📁 ディレクトリ構成
 
-### Step 2: Pre-mortem（事前検死）
-
-作業開始前に「失敗原因になりうること」を3つ以上洗い出す:
-
-```
-例（Gold E2Eの場合）:
-1. 環境変数が未設定 → gh secret list で確認
-2. セレクターが実アプリに存在しない → grep -r "data-testid" src/ で確認
-3. ローカル実行環境がない → npx playwright install で確認
-4. CIワークフローが未設定 → .github/workflows/ を確認
-```
-
-### Step 3: ユーザーへの事前確認
-
-コードを書く前に、以下を報告・確認する:
+<!-- プロジェクトのディレクトリ構成を記載 -->
 
 ```
-「〇〇を始めます。
-
-完了定義: △△（Wiki/DoDの該当箇所）
-想定リスク:
-1. xxx → 確認方法: yyy
-2. xxx → 確認方法: yyy
-
-この理解で進めてよいですか？」
-```
-
-### なぜこれが必要か
-
-```
-❌ リアクティブ: 作業 → 失敗 → 原因分析 → ドキュメント追加
-⭕ プロアクティブ: 完了定義確認 → リスク洗い出し → 作業 → 検証 → 完了
-
-失敗してから学ぶのではなく、失敗を予測して防ぐ。
+src/
+├── app/           # App Router
+├── components/    # UIコンポーネント
+│   ├── ui/        # 基本UI（shadcn/ui等）
+│   └── {feature}/ # 機能別
+├── lib/           # ユーティリティ
+└── types/         # 型定義
 ```
 
 ---
 
-## 言語ルール
+## 🎯 プロジェクト固有ルール
 
-| 対象 | 言語 |
-|-----|------|
-| UI テキスト | 日本語 |
-| ユーザー向けドキュメント | 日本語 |
-| Issue・PR | 日本語 |
-| コミットメッセージ | 日本語（プレフィックスは英語） |
-| 変数名・関数名 | 英語 |
-| コメント | 日本語 |
-| ファイル名 | 英語（kebab-case） |
+<!-- このリポジトリ固有のルールを記載 -->
 
----
+### コーディング規約
 
-## Issue駆動開発
+- 組織Wiki の [開発標準](https://github.com/PROLE-ISLAND/.github/wiki/開発標準) に準拠
+- 追加ルールがあれば以下に記載
 
-### 開発開始時の必須手順
+### テスト方針
 
-**Step 1: 対応可能なIssue確認**
-```bash
-gh issue list -l "ready-to-develop" --json number,title,labels -q '.[] | "\(.number): \(.title)"'
-```
-
-**Step 2: 優先度判断**
-- P0 (Critical) → 最優先で即対応
-- P1 (High) → 今週中に対応
-- P2 (Medium) → スプリント内で対応
-- P3 (Low) → バックログ
-
-**Step 3: Issue詳細確認**
-```bash
-gh issue view {番号}
-```
-
-**Step 4〜8: 要件定義フロー（2段階）** ⚠️必須
-
-> **📚 参照**: [要件定義テンプレート](https://github.com/PROLE-ISLAND/.github/wiki/要件定義テンプレート) | [UI生成・レビューガイド](https://github.com/PROLE-ISLAND/.github/wiki/UI生成・レビューガイド) | [Feature Flags活用ガイド](https://github.com/PROLE-ISLAND/.github/wiki/Feature-Flags活用ガイド)
-
-```
-【2段階要件定義フロー】
-
-Stage 1: ラフ要件定義 + デザインモック
-    │
-    ├── Step 4: Issueコメントでラフ要件定義
-    ├── Step 5: V0でデザインモック作成
-    └── Step 6: デザインレビュー・承認
-    │
-    ▼
-Stage 2: 詳細要件定義（MDファイル確定版）
-    │
-    ├── Step 7: 詳細要件定義MDファイル作成
-    └── Step 8: 詳細要件定義の承認
-    │
-    ▼
-Stage 3: 実装 → PR
-```
-
-**要件定義が必要な条件**:
-- 新機能（feature）の実装
-- UI変更を伴う修正
-- DB/API設計変更を伴う修正
+- 組織Wiki の [テスト戦略](https://github.com/PROLE-ISLAND/.github/wiki/テスト戦略) に準拠
+- 追加ルールがあれば以下に記載
 
 ---
 
-### Stage 1: ラフ要件定義 + デザインモック
+## 🎯 DoD達成のための開発フロー
 
-**Step 4: ラフ要件定義をIssueコメントに投稿**
+### 1. ローカル事前チェック
 
-```bash
-# 1. Issueの内容を詳細に調査
-gh issue view {番号}
-
-# 2. 関連コードの調査
-# - 影響範囲の特定
-# - 既存実装の確認
-
-# 3. ラフ要件定義をIssueコメントとして投稿
-gh issue comment {番号} --body "$(cat <<'EOF'
-## ラフ要件定義（Stage 1）
-
-### 機能概要
-**目的（Why）**:
-**対象ユーザー（Who）**:
-**達成したい価値（What）**:
-
-### ユースケース（ラフ）
-| UC-ID | Role | Outcome | 説明 |
-|-------|------|---------|------|
-| UC-XXX-XXX-XXX-WEB | | | |
-
-### 技術的制約・考慮事項
--
-
-### 次のステップ
-- [ ] V0でデザインモック作成
-- [ ] デザインレビュー依頼
-EOF
-)"
-
-# 4. needs-requirementsラベルを付与
-gh issue edit {番号} --add-label "needs-requirements"
-```
-
-**Step 5: UI生成（v0 + Feature Flags）**
-
-> 📚 参照: [UI生成・レビューガイド](https://github.com/PROLE-ISLAND/.github/wiki/UI生成・レビューガイド) | [Feature Flags活用ガイド](https://github.com/PROLE-ISLAND/.github/wiki/Feature-Flags活用ガイド)
+PR作成前に必ず実行:
 
 ```bash
-# /ui-generate でUIコンポーネントを生成し、リンクをIssueコメントに追加
-gh issue comment {番号} --body "$(cat <<'EOF'
-## UI生成完了
-
-**v0 Link**: https://v0.dev/chat/xxx
-**Preview URL**: https://ui-issue-{番号}.xxx.vercel.app
-
-### 画面一覧
-| 画面 | パス | 状態 |
-|------|------|------|
-| | /xxx | Draft |
-
-### レビュー依頼
-@レビュアー デザインモックのレビューをお願いします
-EOF
-)"
-
-# design-reviewラベルを付与
-gh issue edit {番号} --add-label "design-review"
-```
-
-**Step 6: デザインレビュー・承認**
-
-- レビュアーがデザインモックを確認
-- フィードバック → 修正 → 再レビュー
-- 承認されたら `design-review` → `design-approved` に変更
-
----
-
-### Stage 2: 詳細要件定義（MDファイル確定版）
-
-**Step 7: 詳細要件定義MDファイル作成**
-
-デザインが確定したら、詳細要件定義をMDファイルとして作成。
-これが実装の基準となる確定版ドキュメント。
-
-```bash
-# 1. ブランチ作成
-git checkout -b docs/issue-{番号}-requirements
-
-# 2. 詳細要件定義ファイルを作成
-# パス: docs/requirements/REQ-{番号}.md
-# テンプレート: Wikiの要件定義テンプレートに従う
-
-# 3. コミット・プッシュ
-git add docs/requirements/REQ-{番号}.md
-git commit -m "docs: Issue #{番号} 詳細要件定義"
-git push -u origin docs/issue-{番号}-requirements
-
-# 4. PRを作成（要件定義レビュー用）
-gh pr create --title "docs: Issue #{番号} 詳細要件定義" --body "$(cat <<'EOF'
-## 詳細要件定義
-
-**関連Issue**: #{番号}
-**デザインモック**: [v0 Link](https://v0.dev/chat/xxx)
-
-### レビュー依頼
-詳細要件定義のレビューをお願いします。
-承認後、実装を開始します。
-EOF
-)"
-```
-
-**詳細要件定義MDファイルの内容**（docs/requirements/REQ-{番号}.md）:
-- Phase 2: ユースケース定義、カバレッジマトリクス
-- Phase 3: DoD Level、Pre-mortem
-- Phase 4: DB設計、API設計、UI設計（v0/Figmaリンク）、data-testid
-- Phase 5: Gold E2E判定、GWT仕様
-
-**Step 8: 詳細要件定義の承認**
-
-- レビュアーがMDファイルをレビュー
-- PRがマージされたら `requirements-approved` ラベルを付与
-- 実装開始可能
-
-```bash
-# 承認後、Issueラベルを更新
-gh issue edit {番号} --remove-label "needs-requirements" --add-label "requirements-approved"
-gh issue edit {番号} --add-label "ready-to-develop"
-```
-
----
-
-### Stage 3: 実装 → PR
-
-**Step 9: ブランチ作成**（詳細要件定義承認後）
-```bash
-git checkout main && git pull
-git checkout -b feature/issue-{番号}-{簡潔な説明}
-# 例: git checkout -b feature/issue-42-add-pdf-export
-```
-
-**Step 10: 開発完了後のPR作成**
-```bash
-gh pr create --title "feat: {説明}" --body "$(cat <<'EOF'
-closes #{番号}
-
-## 詳細要件定義
-docs/requirements/REQ-{番号}.md
-
-## 実装内容
--
-EOF
-)"
-```
-
----
-
-## ラベル体系
-
-| ラベル | 意味 |
-|--------|------|
-| `ready-to-develop` | 開発可能 |
-| `in-progress` | 作業中 |
-| `blocked` | ブロック中 |
-| `needs-triage` | 要トリアージ |
-| `needs-investigation` | 調査待ち（PRブロック対象） |
-| `investigation-complete` | 調査完了 |
-| `no-investigation` | 調査不要（バグ修正・ドキュメント等） |
-| `needs-requirements` | 要件定義待ち |
-| `requirements-approved` | 要件定義承認済み |
-| `no-requirements` | 要件定義不要（バグ修正・ドキュメント等） |
-| `design-review` | デザインレビュー待ち |
-| `design-approved` | デザイン承認済み |
-| `no-ui` | UI変更なし |
-
-### 開発ラベルフロー（調査 → 要件定義 → 実装）
-
-```
-【Phase -1: 調査】
-
-/investigate で既存システム調査
-    ↓
-Investigation Report v1 作成
-    ↓
-Issue作成（レポートをリンク）
-    ↓
-`needs-investigation` 自動付与
-    ↓
-調査レポート投稿完了 → `investigation-complete` に変更
-
-【Stage 1: ラフ要件定義 + デザインモック】
-
-    ↓
-`needs-requirements` 付与
-    ↓
-ラフ要件定義コメント投稿
-    ↓
-V0デザインモック作成 → `design-review` 付与
-    ↓
-デザインレビュー・承認 → `design-approved` に変更
-
-【Stage 2: 詳細要件定義（MDファイル）】
-
-    ↓
-詳細要件定義MDファイル作成（docs/requirements/REQ-{番号}.md）
-    ↓
-詳細要件定義PR作成・レビュー
-    ↓
-PRマージ → `requirements-approved` 付与
-    ↓
-`ready-to-develop` 付与（実装開始可能）
-
-【Stage 3: 実装】
-
-    ↓
-実装 → PR作成
-    ↓
-CIチェック（調査完了 + 詳細要件定義ファイル存在確認）
-    ↓
-マージ
-```
-
-**⚠️ 重要（CIゲート）**:
-- `investigation-complete` ラベルがないIssueに対する `feat:` PRはCIでブロック
-- `requirements-approved` ラベルがないIssueに対する `feat:` PRはCIでブロック
-- 詳細要件定義ファイル（docs/requirements/REQ-{番号}.md）がないPRはCIでブロック
-
----
-
-## DoD (Definition of Done)
-
-**詳細は [DoD_STANDARDS.md](https://github.com/PROLE-ISLAND/.github/blob/main/DoD_STANDARDS.md) を参照。**
-
-| Level | 観点数 | 用途 | カバレッジ目標 |
-|-------|--------|------|---------------|
-| Bronze | 27 | PR最低基準 | 80% |
-| Silver | 31 | マージ可能基準 | 85% |
-| Gold | 19 | 本番リリース基準 | 95% |
-
-### ローカル事前チェック（PR前に必須）
-
-```bash
-# Bronze Gate チェック（型チェック, Lint, テスト, カバレッジ80%, ビルド）
+# Bronze Gate チェック（PR最低基準）
 npm run check:bronze
 
-# Silver Gate チェック（Bronze + セキュリティ監査, カバレッジ85%）
+# Silver Gate チェック（マージ前）
 npm run check:silver
 
-# Gold Gate チェック（Silver + E2E, カバレッジ95%）
+# Gold Gate チェック（本番リリース前）
 npm run check:gold
 ```
 
-### 成熟度計算
+### 2. 実装ガイド参照
 
-```
-総合成熟度 = (Bronze完了率 × 40%) + (Silver完了率 × 30%) + (Gold完了率 × 30%)
+| ガイド | 内容 |
+|--------|------|
+| [DoD達成ガイド](https://github.com/PROLE-ISLAND/.github/wiki/DoD達成ガイド) | 77観点の具体的達成方法 |
+| [テスト実装パターン](https://github.com/PROLE-ISLAND/.github/wiki/テスト実装パターン) | カバレッジ80%達成のパターン |
+| [Goldテストチャーター](https://github.com/PROLE-ISLAND/.github/wiki/Goldテストチャーター) | Gold E2Eの目的・採用基準 |
+| [Gold仕様テンプレート](https://github.com/PROLE-ISLAND/.github/wiki/Gold仕様テンプレート) | GWT形式の仕様テンプレート |
+| [セキュリティ実装ガイド](https://github.com/PROLE-ISLAND/.github/wiki/セキュリティ実装ガイド) | C1-C11の実装方法 |
+| [DB設計レビューガイド](https://github.com/PROLE-ISLAND/.github/wiki/DB設計レビューガイド) | G1-G6の確認プロセス |
+| [API設計ガイド](https://github.com/PROLE-ISLAND/.github/wiki/API設計ガイド) | F1-F8 + OpenAPIテンプレート |
 
-Gold:   90%以上 - 本番リリース可能
-Silver: 70%以上 - マージ可能
-Bronze: 40%以上 - レビュー可能
-```
+### 3. DB/API変更時の注意
 
----
+Issue/PRテンプレートのチェックリストを確認:
 
-## ブランチ命名規則
+**DB変更時**:
+- [ ] マイグレーションファイル作成
+- [ ] RLSポリシー設定
+- [ ] インデックス検討
 
-```
-feature/issue-{番号}-{説明}   # 新機能
-bugfix/issue-{番号}-{説明}    # バグ修正
-hotfix/issue-{番号}-{説明}    # 緊急修正
-```
-
-### 自動承認対象
-
-以下のプレフィックスは自動承認（軽微な変更）：
-- `chore/`
-- `deps/`
-- `docs/`
-- `ci/`
-- `fix/sync`
+**API変更時**:
+- [ ] OpenAPI仕様更新
+- [ ] 破壊的変更の確認
+- [ ] エラーレスポンス定義
 
 ---
 
-## 並行開発ガイドライン
+## 🔗 関連ドキュメント
 
-複数のIssueを同時に開発する場合のルール。
+### 組織レベル
+- [DoD_STANDARDS.md](https://github.com/PROLE-ISLAND/.github/blob/main/DoD_STANDARDS.md) - 品質基準（77観点）
+- [組織Wiki](https://github.com/PROLE-ISLAND/.github/wiki) - 詳細ガイドライン
+- [組織CLAUDE.md](https://github.com/PROLE-ISLAND/.github/blob/main/CLAUDE.md) - 組織共通開発ルール
 
-### 基本方針
-- **別ブランチで作業**: 各Issueは独立したブランチで開発
-- **mainから分岐**: 必ずmainブランチから新規ブランチを作成
-- **早めにPR**: 作業完了したらすぐPR作成
-
-### Git Worktree による並行開発（推奨）
-
-複数のClaude Codeセッションで並行開発する場合は、**git worktree** を使用して物理的にワーキングディレクトリを分離する。
-
-**ツール**: [git-worktree-runner (gtr)](https://github.com/coderabbitai/git-worktree-runner)
-
-```bash
-# 新しいworktree作成（Issue用）
-git gtr new feature/issue-21-example
-
-# Claude Codeを起動
-git gtr ai feature/issue-21-example
-
-# エディタで開く
-git gtr editor feature/issue-21-example
-
-# 一覧表示
-git gtr list
-
-# 作業完了後に削除
-git gtr rm feature/issue-21-example
-```
-
-**なぜworktreeが必要か:**
-- 同じリポジトリでも**ローカルファイルは1セット**しかない
-- 別セッションが `git checkout` すると、未コミット変更が消える
-- worktreeなら**物理的に別ディレクトリ**なので安全
-
-### コンフリクト防止
-
-| 状況 | 対応 |
-|------|------|
-| 同じファイルを編集する複数Issue | 1つずつ順番に対応（先にマージされた方を優先） |
-| 依存関係がある | 依存元を先にマージ、依存先はその後にリベース |
-| 独立したIssue | worktreeで並行開発OK |
-| 複数セッション同時開発 | **必ずworktree使用** |
-
-### コンフリクト発生時
-
-```bash
-# 1. mainを最新化
-git checkout main && git pull
-
-# 2. 作業ブランチをリベース
-git checkout feature/issue-xxx
-git rebase main
-
-# 3. コンフリクト解消後
-git add . && git rebase --continue
-
-# 4. 強制プッシュ（自分のブランチのみ）
-git push --force-with-lease
-```
+### プロジェクトレベル
+- [プロジェクトWiki](https://github.com/PROLE-ISLAND/{リポジトリ名}/wiki) - プロジェクト固有ドキュメント
 
 ---
 
-## コミットメッセージ規則
+## 📝 使い方
 
-### 形式
-
-```
-{type}: {日本語で説明}
-
-{詳細説明（任意）}
-```
-
-### プレフィックス（type）
-
-| type | 用途 | 例 |
-|------|------|-----|
-| `feat` | 新機能 | `feat: ユーザー登録機能を追加` |
-| `fix` | バグ修正 | `fix: ログインエラーを修正` |
-| `docs` | ドキュメント | `docs: READMEを更新` |
-| `style` | フォーマット | `style: コードフォーマットを適用` |
-| `refactor` | リファクタリング | `refactor: 認証ロジックを整理` |
-| `test` | テスト | `test: ユーザー登録のテストを追加` |
-| `chore` | 雑務 | `chore: 依存関係を更新` |
-| `ci` | CI/CD | `ci: GitHub Actions を修正` |
-| `perf` | パフォーマンス | `perf: クエリを最適化` |
-
----
-
-## PR規約
-
-- タイトル: 日本語、プレフィックス付き（例: `feat: 〇〇機能を追加`）
-- 本文: 日本語、`closes #番号` でIssue紐付け必須
-- レビュー: 最低1名の承認必須
-
-### 必須項目
-
-- [ ] 変更概要
-- [ ] 影響範囲
-- [ ] テスト方法
-- [ ] スクリーンショット（UI変更時）
-
----
-
-## UI開発ワークフロー（v0 MCP + Vercel Toolbar + Feature Flags）
-
-> 📚 参照: [UI生成・レビューガイド](https://github.com/PROLE-ISLAND/.github/wiki/UI生成・レビューガイド) | [Feature Flags活用ガイド](https://github.com/PROLE-ISLAND/.github/wiki/Feature-Flags活用ガイド)
-
-**UI/UX変更を含む機能は、v0 MCP Server + Vercel Toolbar + Feature Flagsの統合ワークフローで開発する。**
-
-### v0 MCP Server設定（必須）
-
-```json
-// .mcp.json
-{
-  "mcpServers": {
-    "v0": {
-      "command": "npx",
-      "args": ["mcp-remote", "https://mcp.v0.dev", "--header", "Authorization: Bearer ${V0_API_KEY}"]
-    }
-  }
-}
-```
-
-**GitHub Secrets**: `V0_API_KEY` を設定（https://v0.dev/chat/settings/keys で発行）
-
-### 完全自動化フロー
-
-```
-【/ui-generate 実行で全自動化】
-
-Phase 1: UI生成（自動）
-├── 要件・Issue確認
-├── `/ui-generate` コマンド実行
-├── v0 MCP Server経由でコンポーネント生成 ← 自動
-├── v0チャットURL自動取得 ← 自動
-└── Design System Registry参照で既存UIと統一
-
-Phase 2: コード管理（自動）
-├── `ui/issue-{番号}` ブランチ作成
-├── Feature Flags定義追加（flags.ts）
-├── バリアント切り替えコンポーネント実装
-└── GitHub Push → Vercel Preview Deployment
-
-Phase 3: URL取得・通知（自動）
-├── Vercel Preview完了待機
-├── Preview URL自動取得（Vercel bot解析） ← 自動
-└── Issueに v0リンク + Preview URL 自動コメント ← 自動
-
-Phase 4: Preview & Review（手動）
-├── Vercel Toolbarでバリアント切り替え（Flags Explorer）
-├── ピクセル位置指定でフィードバック（Comments）
-├── 品質自動チェック（a11y / CLS / INP）
-└── 設定付きURL共有でレビュー
-
-Phase 5: 決定 & リリース
-├── デザイン決定
-├── 不要バリアント削除・コードクリーンアップ
-├── PR Merge
-└── 段階的ロールアウト（0% → 10% → 30% → 70% → 100%）
-```
-
-### Feature Flags設定
-
-```typescript
-// lib/flags.ts
-import { flag } from '@vercel/flags/next';
-
-// デザインバリアント切り替え
-export const designVariant = flag<'a' | 'b' | 'c'>({
-  key: '{feature}-design-variant',
-  defaultValue: 'a',
-  description: '{機能名}のデザインバリアント',
-  options: [
-    { value: 'a', label: 'パターンA' },
-    { value: 'b', label: 'パターンB' },
-    { value: 'c', label: 'パターンC' },
-  ],
-});
-
-// エッジケーステスト
-export const testMode = flag<'normal' | 'empty' | 'error' | 'loading'>({
-  key: '{feature}-test-mode',
-  defaultValue: 'normal',
-});
-
-// 段階的ロールアウト
-export const rolloutPercentage = flag<number>({
-  key: '{feature}-rollout-percentage',
-  defaultValue: 0,
-});
-```
-
-### Vercel Toolbar操作
-
-| 機能 | 用途 | ショートカット |
-|------|------|---------------|
-| **Flags Explorer** | バリアント切り替え | Ctrl → Flags |
-| **Comments** | ピクセル位置フィードバック | Ctrl → Comments |
-| **a11y Audit** | WCAG 2.0チェック | Ctrl → Accessibility |
-| **CLS Detection** | レイアウトシフト検出 | Ctrl → Layout shifts |
-| **INP** | インタラクション遅延計測 | Ctrl → Interaction timing |
-
-### バックエンドのみの機能
-
-UI変更がない場合:
-1. Issueテンプレートで「バックエンドのみ」にチェック
-2. `no-ui` ラベルを付与
-3. Feature Flagsは不要
-
----
-
-## v0 Platform API
-
-[v0.dev](https://v0.dev) と Design System Registry を統合して、既存UIと統一されたコンポーネントを生成。
-
-### Design System Registry設定
-
-```json
-// registry.json
-{
-  "$schema": "https://ui.shadcn.com/schema/registry.json",
-  "name": "project-name",
-  "components": [
-    {
-      "name": "score-card",
-      "files": ["src/components/ui/score-card.tsx"],
-      "dependencies": ["@radix-ui/react-progress"]
-    }
-  ],
-  "tokens": {
-    "colors": "src/styles/tokens/colors.css",
-    "fonts": "src/styles/tokens/fonts.css"
-  }
-}
-```
-
-### v0プロンプトの必須要素
-
-```markdown
-- 既存Design System Registryを参照
-- shadcn/uiコンポーネント使用
-- Tailwind CSS
-- ダークモード対応（dark:クラス使用）
-- 日本語テキスト
-- TypeScript対応
-- data-testid属性を含める
-```
-
-### v0コード使用時の必須チェック
-
-1. **Design System統合**: 既存トークン・コンポーネントとの整合性
-2. **Feature Flags統合**: バリアント切り替え実装
-3. **data-testid**: E2Eテスト用セレクター追加
-4. **型安全性**: Props interfaceを追加
-5. **出典記録**: コンポーネント冒頭にv0 URLをコメントで記載
-
----
-
-## デザイン品質チェックリスト
-
-UI機能の実装前に確認:
-
-- [ ] モバイルレスポンシブ対応
-- [ ] ダークモード対応
-- [ ] アクセシビリティ（コントラスト、フォントサイズ、ARIA）
-- [ ] 既存デザインとの整合性
-- [ ] ローディング状態
-- [ ] エラー状態
-- [ ] 空状態（データがない場合）
-
+1. このテンプレートをリポジトリルートに `CLAUDE.md` としてコピー
+2. `{リポジトリ名}` を実際のリポジトリ名に置換
+3. 技術スタック・ディレクトリ構成を実際の内容に更新
+4. プロジェクト固有ルールを追記
+5. Copilot 用にシンボリックリンクを作成:
+   ```bash
+   ln -sf CLAUDE.md .github/copilot-instructions.md
+   ```
