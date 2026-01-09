@@ -1,7 +1,7 @@
-name: Feature Request
+name: "[機能] Feature Request"
 description: 機能要望・新機能追加
-title: "[Feature]: "
-labels: ["feature", "needs-triage", "needs-investigation"]
+title: "[機能]: "
+labels: ["feature", "needs-triage"]
 body:
   - type: markdown
     attributes:
@@ -10,18 +10,11 @@ body:
 
         📚 参考:
         - [DoD基準](https://github.com/PROLE-ISLAND/.github/blob/main/DoD_STANDARDS.md)
-        - [Goldテストチャーター](https://github.com/PROLE-ISLAND/.github/wiki/Goldテストチャーター)
-        - [ユースケース定義](https://github.com/PROLE-ISLAND/.github/wiki/ユースケース定義)
         - [調査スキル活用ガイド](https://github.com/PROLE-ISLAND/.github/wiki/調査スキル活用ガイド)
 
         ### ⚠️ 調査ファースト原則
         **Issue作成前に既存システムの調査を行ってください。**
         `/investigate` コマンドで調査レポートを作成し、このIssueにリンクしてください。
-
-        ### UI開発ワークフロー（v0 + Vercel Toolbar + Feature Flags）
-        **UI/UX変更を含む機能は、v0でデザインを生成し、Feature Flagsでバリアント管理してください。**
-        Preview URLとv0リンクがない場合、`design-review` ラベルで保留されます。
-        📚 [UI生成・レビューガイド](https://github.com/PROLE-ISLAND/.github/wiki/UI生成・レビューガイド)
 
   - type: dropdown
     id: priority
@@ -45,9 +38,9 @@ body:
         この機能に求める品質レベル。
         詳細: https://github.com/PROLE-ISLAND/.github/blob/main/DoD_STANDARDS.md
       options:
-        - Bronze (27観点・80%カバレッジ) ← プロトタイプ
-        - Silver (31観点・85%カバレッジ) ← 推奨
-        - Gold (19観点・95%カバレッジ) ← 本番品質
+        - Bronze (80%カバレッジ) - プロトタイプ
+        - Silver (85%カバレッジ) - 推奨
+        - Gold (95%カバレッジ) - 本番品質
       default: 1
     validations:
       required: true
@@ -58,18 +51,16 @@ body:
         ---
         ## 📋 事前調査（Investigation）
 
-        > **重要**: 既存システムを理解せずに開発を始めると手戻りが発生します。
-        > `/investigate` コマンドで調査レポートを作成してからIssueを作成してください。
-
   - type: input
     id: investigation_report
     attributes:
-      label: 調査レポートリンク ⚠️推奨
+      label: 調査レポートリンク
       description: |
         `/investigate` で作成した調査レポートへのリンク。
-        IssueコメントURL、または別ドキュメントのURL。
-        未調査の場合は「未調査」と記入（needs-investigation ラベルが付与されます）
-      placeholder: "https://github.com/PROLE-ISLAND/xxx/issues/123#issuecomment-456 または「未調査」"
+        未調査の場合は「未調査」と記入。
+      placeholder: "https://github.com/... または「未調査」"
+    validations:
+      required: true
 
   - type: input
     id: existing_system_name
@@ -77,29 +68,114 @@ body:
       label: 関連する既存システム名
       description: |
         この機能が拡張・変更する既存システムの名前。
-        例: GFD-Gate v1, Assessment Engine, Report Generator
         新規システムの場合は「新規」と記入。
-      placeholder: "GFD-Gate v1"
+      placeholder: "例: management-dashboard, hybrand"
 
-  - type: input
-    id: system_spec_link
+  - type: markdown
     attributes:
-      label: 関連仕様書リンク
-      description: |
-        関連する既存システムの仕様書へのリンク（docs/system-specs/...）
-        存在しない場合は「なし」と記入。
-      placeholder: "docs/system-specs/assessment/gfd-gate-v1.md"
+      value: |
+        ---
+        ## 🔴 問題定義（なぜ必要か）
 
-  - type: checkboxes
-    id: investigation_checklist
+  - type: textarea
+    id: current_problem
     attributes:
-      label: 事前調査チェックリスト
-      description: Issue作成前に確認してください
-      options:
-        - label: "既存実装を調査し、拡張ポイントを特定した"
-        - label: "破壊ポイント（壊れる可能性がある箇所）を特定した"
-        - label: "調査レポートを作成した（または調査不要と判断した理由がある）"
-        - label: "**調査不要**: バグ修正・ドキュメント・CI修正など"
+      label: 現状の課題
+      description: 現在どんな問題・不便が発生しているか具体的に記述
+      placeholder: |
+        例: 複数のShopifyストアの売上確認に個別ログインが必要で、
+        全体像の把握に毎日15-30分かかっている
+    validations:
+      required: true
+
+  - type: textarea
+    id: affected_people
+    attributes:
+      label: 影響を受ける人
+      description: 誰がこの問題で困っているか - 役割を明記
+      placeholder: |
+        例:
+        - マネージャー: 日次の売上確認に時間がかかる
+        - 経営層: 月次レポート作成時に全体把握が困難
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact_level
+    attributes:
+      label: 問題の影響度
+      description: この問題による損失・非効率を定量的に記述
+      placeholder: |
+        例:
+        - 毎日15-30分の作業時間ロス
+        - 手動集計によるヒューマンエラーリスク
+        - リアルタイム異常検知ができない
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ## 🎯 ゴール候補（/req で1つ選択）
+
+  - type: textarea
+    id: goal_option_a
+    attributes:
+      label: 案A
+      description: 最も推奨するアプローチ
+      value: |
+        **アプローチ名**:
+        **概要**:
+        **メリット**:
+        **デメリット**:
+        **想定工数**: 小/中/大
+    validations:
+      required: true
+
+  - type: textarea
+    id: goal_option_b
+    attributes:
+      label: 案B
+      description: 代替アプローチ
+      value: |
+        **アプローチ名**:
+        **概要**:
+        **メリット**:
+        **デメリット**:
+        **想定工数**: 小/中/大
+    validations:
+      required: true
+
+  - type: textarea
+    id: goal_option_c
+    attributes:
+      label: 案C（任意）
+      description: その他のアプローチ（任意）
+      value: |
+        **アプローチ名**:
+        **概要**:
+        **メリット**:
+        **デメリット**:
+        **想定工数**: 小/中/大
+
+  - type: textarea
+    id: recommended_goal
+    attributes:
+      label: 暫定推奨
+      description: どの案を推奨するか、その理由
+      placeholder: "案A - 理由: ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: success_metrics
+    attributes:
+      label: 成功指標（仮 - /req で詳細化）
+      description: 「解決した」と言えるための測定可能な基準
+      value: |
+        - [ ]
+        - [ ]
+    validations:
+      required: true
 
   - type: markdown
     attributes:
@@ -110,21 +186,9 @@ body:
   - type: textarea
     id: description
     attributes:
-      label: 機能説明
-      description: 追加したい機能の説明
+      label: 機能概要
+      description: 解決策の概要（詳細設計は /req で行う）
       placeholder: どのような機能を追加したいですか？
-    validations:
-      required: true
-
-  - type: textarea
-    id: motivation
-    attributes:
-      label: 背景・動機（Why）
-      description: なぜこの機能が必要ですか？
-      placeholder: |
-        - 現状の課題：
-        - この機能がもたらすメリット：
-        - 対象ユーザー：
     validations:
       required: true
 
@@ -132,15 +196,11 @@ body:
     id: usecase_definition
     attributes:
       label: ユースケース定義（Role × Outcome）
-      description: |
-        この機能のユースケースを「誰が」「何を達成するか」で定義。
-        参考: https://github.com/PROLE-ISLAND/.github/wiki/ユースケース定義
+      description: この機能のユースケースを「誰が」「何を達成するか」で定義
       value: |
-        **Role（誰が）**:
-        **Outcome（何を達成）**:
-        **Channel（どこから）**: Web / API / モバイル
-
-        例: 「管理者が候補者を登録して検査リンクを発行する」
+        | UC-ID | Role | Outcome | Channel |
+        |-------|------|---------|---------|
+        | UC-XXX-YYY-ZZZ-WEB | {役割} | {達成したいこと} | WEB/API |
     validations:
       required: true
 
@@ -148,9 +208,7 @@ body:
     id: gold_candidate
     attributes:
       label: Gold E2E 候補か？
-      description: |
-        この機能は Gold E2E テストの対象候補か？
-        参考: https://github.com/PROLE-ISLAND/.github/wiki/Goldテストチャーター
+      description: この機能は Gold E2E テストの対象候補か？
       options:
         - "いいえ（軽微な機能・内部改善）"
         - "はい（主要フロー・ビジネス影響大）"
@@ -159,66 +217,57 @@ body:
     validations:
       required: true
 
-  - type: textarea
-    id: five_lenses
+  - type: markdown
     attributes:
-      label: 5つのレンズ評価（Gold候補の場合のみ）
-      description: |
-        Gold E2E 候補の場合、5つのレンズで評価。
-        参考: https://github.com/PROLE-ISLAND/.github/wiki/Goldテストチャーター#採用基準5つのレンズ
       value: |
-        <!-- Gold候補でない場合は「該当なし」と記入 -->
-
-        | レンズ | Yes/No | 根拠 |
-        |--------|--------|------|
-        | 壊れたら困るか？ | | |
-        | 振る舞いを見てるか？ | | |
-        | 嘘をついて通れないか？ | | |
-        | 1文で説明できるか？ | | |
-        | 無いと何を諦めるか？ | | |
+        ---
+        ## 🎨 UI開発（該当する場合）
 
   - type: input
     id: v0_link
     attributes:
-      label: v0 Link（/ui-generate実行後に自動取得）
+      label: v0 Link
       description: |
-        `/ui-generate` 実行後に**自動取得**されます。
-        手動入力の場合は https://v0.dev/chat/... 形式で記入。
+        v0で生成したUIコンポーネントのリンク。
         バックエンドのみの機能は「N/A」と記入。
-      placeholder: "/ui-generate実行後に自動取得 または 手動でURL入力"
-
-  - type: input
-    id: preview_url
-    attributes:
-      label: Preview URL（/ui-generate実行後に自動取得）
-      description: |
-        `/ui-generate` 実行後に**Vercel botコメントから自動取得**されます。
-        Toolbarでバリアント切り替え・レビューが可能。
-        バックエンドのみの機能は「N/A」と記入。
-      placeholder: "/ui-generate実行後に自動取得 または 手動でURL入力"
-
-  - type: input
-    id: variants
-    attributes:
-      label: デザインバリアント数
-      description: |
-        Feature Flagsで管理しているバリアント数。
-        `/ui-generate --variants {数}` で指定可能。
-        バックエンドのみの機能は「0」と記入。
-      placeholder: "3"
+      placeholder: "https://v0.dev/chat/... または N/A"
 
   - type: checkboxes
-    id: design_checklist
+    id: ui_variants
     attributes:
-      label: UI開発チェックリスト
-      description: UI/UX機能の場合、以下を確認してください
+      label: UIバリアント
+      description: 実装するUIバリアントをチェック
       options:
-        - label: "v0でUIコンポーネントを生成した"
-        - label: "Feature Flagsでバリアント管理を設定した"
-        - label: "Preview URLでVercel Toolbarが動作する"
-        - label: "Toolbarのa11y監査をパスした"
-        - label: "Toolbarでバリアントを切り替えてレビュー可能"
-        - label: "バックエンドのみの機能（UI変更なし）"
+        - label: "Default（正常表示）"
+        - label: "Loading（読み込み中）"
+        - label: "Empty（データなし）"
+        - label: "Error（エラー表示）"
+        - label: "バックエンドのみ（UI変更なし）"
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ## 📊 影響範囲
+
+  - type: checkboxes
+    id: impact_scope
+    attributes:
+      label: 変更対象
+      description: この変更が影響する範囲をチェック
+      options:
+        - label: "フロントエンド（コンポーネント）"
+        - label: "バックエンド（API）"
+        - label: "データベース（スキーマ/マイグレーション）"
+        - label: "インフラ（CI/CD、設定）"
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ## ✅ 受け入れ条件
 
   - type: textarea
     id: acceptance_criteria
@@ -232,48 +281,6 @@ body:
     validations:
       required: true
 
-  - type: textarea
-    id: impact_scope
-    attributes:
-      label: 影響範囲
-      description: この変更が影響する範囲
-      value: |
-        ### 変更対象
-        - [ ] フロントエンド（コンポーネント）
-        - [ ] バックエンド（API）
-        - [ ] データベース（スキーマ/マイグレーション）
-        - [ ] インフラ（CI/CD、設定）
-
-        ### 変更予定ファイル
-        -
-
-        ### 影響を受ける既存機能
-        -
-    validations:
-      required: true
-
-  - type: checkboxes
-    id: db_changes
-    attributes:
-      label: データベース変更
-      description: DB変更がある場合はチェック
-      options:
-        - label: "テーブル追加/変更あり → マイグレーション必須"
-        - label: "RLSポリシー追加/変更あり"
-        - label: "インデックス追加が必要"
-        - label: "DB変更なし"
-
-  - type: checkboxes
-    id: api_changes
-    attributes:
-      label: API変更
-      description: API変更がある場合はチェック
-      options:
-        - label: "新規エンドポイント追加"
-        - label: "既存エンドポイント変更（破壊的変更の可能性）"
-        - label: "レスポンス形式変更"
-        - label: "API変更なし"
-
   - type: checkboxes
     id: checklist
     attributes:
@@ -281,3 +288,4 @@ body:
       options:
         - label: 重複Issueがないことを確認しました
           required: true
+        - label: 調査レポートを作成した（または調査不要の理由がある）
