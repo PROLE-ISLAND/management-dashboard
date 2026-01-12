@@ -1,0 +1,31 @@
+# =====================================================
+# CODEOWNERS - 自動生成ファイル
+# 組織テンプレート + ローカル拡張のマージ結果
+# 
+# 編集方法:
+#   - 組織共通ルール: PROLE-ISLAND/.github の CODEOWNERS_TEMPLATE.md
+#   - リポジトリ固有ルール: .github/CODEOWNERS.local に追記
+# =====================================================
+
+# === 組織共通ルール ===
+* @PROLE-ISLAND/developers
+/.github/ @PROLE-ISLAND/devops
+/.github/workflows/ @PROLE-ISLAND/devops
+/.github/CODEOWNERS @PROLE-ISLAND/devops
+Dockerfile @PROLE-ISLAND/devops
+docker-compose*.yml @PROLE-ISLAND/devops
+vercel.json @PROLE-ISLAND/devops
+*.md @PROLE-ISLAND/developers
+CLAUDE.md @PROLE-ISLAND/devops
+docs/ @PROLE-ISLAND/developers
+*.config.js @PROLE-ISLAND/devops
+*.config.ts @PROLE-ISLAND/devops
+tsconfig*.json @PROLE-ISLAND/devops
+/src/components/ @PROLE-ISLAND/frontend
+/src/app/ @PROLE-ISLAND/frontend @PROLE-ISLAND/backend
+/src/hooks/ @PROLE-ISLAND/frontend
+/src/styles/ @PROLE-ISLAND/frontend
+*.css @PROLE-ISLAND/frontend
+*.scss @PROLE-ISLAND/frontend
+/src/components/ui/ @PROLE-ISLAND/frontend
+
